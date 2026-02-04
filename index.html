@@ -3,269 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXA GLOBAL MASTER | نظام السيادة الرقمية الشامل</title>
+    <title>NEXA GLOBAL | Sovereign OS Full Suite v3.0</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+Arabic:wght@300;500;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --nexa-prime: #00f2ff;
-            --nexa-gold: #d4af37;
-            --nexa-void: #020617;
-            --nexa-danger: #ff0055;
-            --nexa-safe: #00ff88;
-            --nexa-metamask: #f6851b;
-            --glass: rgba(255, 255, 255, 0.05);
+            --primary: #00f2ff;
+            --accent: #d4af37;
+            --bg-dark: #050a14;
+            --card-bg: rgba(15, 23, 42, 0.9);
+            --border: rgba(0, 242, 255, 0.25);
+            --neon-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.3s ease; }
+
         body { 
-            background: var(--nexa-void); 
-            color: #e2e8f0; 
-            font-family: 'Segoe UI', sans-serif; 
-            overflow: hidden; 
+            background: radial-gradient(circle at center, #0f172a 0%, #050a14 100%);
+            color: #f1f5f9;
+            font-family: 'Noto Sans Arabic', sans-serif;
             height: 100vh;
+            overflow: hidden;
+            display: flex;
         }
 
-        /* حاوية النظام المركزية */
-        .mainframe {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            height: 100vh;
-        }
-
-        /* الجانب الأيمن: الرادار ومراحل التشفير */
+        /*Sidebar*/
         .sidebar {
-            background: rgba(0,0,0,0.5);
-            border-left: 1px solid var(--glass);
-            padding: 25px;
+            width: 350px;
+            background: rgba(2, 6, 23, 0.95);
+            border-left: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            z-index: 100;
         }
 
+        .brand-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-shadow: var(--neon-shadow);
+            text-align: center;
+        }
+
+        /*Radar*/
         .radar-box {
-            width: 100%; height: 200px;
-            border: 1px solid var(--nexa-prime);
-            border-radius: 15px;
-            position: relative; overflow: hidden;
-            background: radial-gradient(circle, #0c1a33, #020617);
+            position: relative;
+            width: 100%; height: 180px;
+            background: #000;
+            border-radius: 20px;
+            border: 1px solid var(--primary);
+            overflow: hidden;
+            margin: 20px 0;
         }
-
-        .sweep {
+        .radar-sweep {
+            position: absolute;
             width: 200%; height: 200%;
-            background: conic-gradient(from 0deg, transparent, var(--nexa-prime));
-            position: absolute; top: -50%; left: -50%;
-            opacity: 0.1; animation: rotate 4s linear infinite;
+            top: -50%; left: -50%;
+            background: conic-gradient(from 0deg, transparent, rgba(0, 242, 255, 0.3));
+            animation: rotate 4s linear infinite;
         }
-
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .step-indicator {
-            padding: 12px; background: var(--glass);
-            border-radius: 10px; font-size: 11px;
-            display: flex; align-items: center; gap: 10px;
-            border-right: 3px solid #334155; transition: 0.4s;
+        /*Steps*/
+        .step-item {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0.5;
         }
-        .step-active { border-right-color: var(--nexa-prime); background: rgba(0,242,255,0.1); }
-        .step-done { border-right-color: var(--nexa-safe); color: var(--nexa-safe); }
+        .step-item.active { opacity: 1; border-right: 3px solid var(--primary); box-shadow: var(--neon-shadow); }
 
-        /* منطقة العمليات */
-        .workspace { padding: 40px; position: relative; overflow-y: auto; }
-
-        .header-nav {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .wallet-pill {
-            background: var(--nexa-metamask);
-            padding: 10px 20px; border-radius: 50px;
-            font-weight: bold; cursor: pointer; border: none; color: white;
-            display: flex; align-items: center; gap: 10px;
-        }
-
-        .vault-zone {
-            border: 2px dashed var(--nexa-prime);
-            padding: 60px; border-radius: 30px;
-            text-align: center; cursor: pointer;
-            transition: 0.3s; margin-bottom: 20px;
+        /*Main*/
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .vault-zone:hover { background: rgba(0,242,255,0.02); }
-
-        .nexa-inputs {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;
+        .action-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
         }
 
-        .input-group {
-            background: var(--glass); padding: 15px; border-radius: 12px;
+        .wallet-connector {
+            background: linear-gradient(135deg, #f6851b, #e2761b);
+            border: none; padding: 10px 20px; border-radius: 10px;
+            color: #fff; font-weight: 800; cursor: pointer;
         }
 
-        input {
-            width: 100%; background: none; border: none; color: white;
-            outline: none; margin-top: 5px; font-size: 14px;
+        /*Upload & Progress*/
+        .vault-upload {
+            height: 200px;
+            border: 2px dashed var(--primary);
+            background: rgba(0, 242, 255, 0.02);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .progress-wrapper { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; display: none; }
+        #progress-bar { width: 0%; height: 100%; background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+
+        /*Cloud Vault Table*/
+        .cloud-vault {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .vault-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .vault-table th { color: var(--accent); text-align: right; font-size: 0.8rem; padding: 10px; border-bottom: 1px solid var(--border); }
+        .vault-table td { padding: 12px 10px; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .action-icon { cursor: pointer; color: var(--primary); }
+        .action-icon:hover { color: #fff; }
+
+        .btn-execute {
+            background: linear-gradient(90deg, var(--accent), #fcd34d);
+            color: #050a14; padding: 18px; border-radius: 12px;
+            border: none; font-family: 'Orbitron', sans-serif;
+            font-weight: 900; font-size: 1.1rem; cursor: pointer;
         }
 
-        .btn-master {
-            width: 100%; padding: 20px; background: var(--nexa-gold);
-            border: none; border-radius: 15px; font-weight: 900;
-            font-size: 18px; cursor: pointer; text-transform: uppercase;
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
-        }
-
-        .terminal {
-            background: #000; border-radius: 15px; padding: 20px;
-            height: 150px; overflow-y: auto; font-family: monospace;
-            font-size: 11px; color: var(--nexa-safe); border: 1px solid #1e293b;
-        }
-
-        /* زر الطوارئ */
-        .panic-btn {
-            background: var(--nexa-danger); color: white;
-            padding: 15px; border-radius: 50%; border: none;
-            position: fixed; bottom: 30px; left: 30px;
-            width: 60px; height: 60px; cursor: pointer;
-            box-shadow: 0 0 20px var(--nexa-danger);
-        }
+        .terminal-box { height: 100px; background: #000; border-radius: 10px; padding: 10px; font-family: monospace; font-size: 0.75rem; color: #00ff88; overflow-y: auto; }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
 
-<div class="mainframe">
     <aside class="sidebar">
-        <div class="radar-box">
-            <div class="sweep"></div>
-            <i class="fa-solid fa-earth-africa" style="position: absolute; top:40%; left:42%; color: var(--nexa-prime); font-size: 30px;"></i>
-            <div style="position: absolute; bottom: 10px; width: 100%; text-align: center; font-size: 9px; color: var(--nexa-prime);">رادار NEXA: مراقبة النطاق العالمي</div>
+        <div class="brand-header">
+            <h1>NEXA GLOBAL</h1>
+            <p style="color: #64748b; font-size: 0.7rem; font-weight: 800; text-align:center;">SOVEREIGN OS v3.0</p>
         </div>
-
-        <div class="step-indicator" id="s1"><i class="fa-solid fa-atom"></i> 1. التفكيك الجزيئي للـ DNA</div>
-        <div class="step-indicator" id="s2"><i class="fa-solid fa-shield-virus"></i> 2. حقن درع منع الاستغلال</div>
-        <div class="step-indicator" id="s3"><i class="fa-solid fa-key"></i> 3. توثيق MetaMask السيادي</div>
-        <div class="step-indicator" id="s4"><i class="fa-solid fa-map-location-dot"></i> 4. تفعيل القفل الجغرافي</div>
-        <div class="step-indicator" id="s5"><i class="fa-solid fa-file-signature"></i> 5. توليد بصمة .nxa النهائية</div>
+        <div class="radar-box"><div class="radar-sweep"></div></div>
+        <div class="step-list">
+            <div class="step-item" id="s1"><i class="fas fa-fingerprint"></i> التحقق الحيوي</div>
+            <div class="step-item" id="s2"><i class="fas fa-key"></i> تشفير المفاتيح</div>
+            <div class="step-item" id="s3"><i class="fas fa-link"></i> ربط الـ Web3</div>
+            <div class="step-item" id="s4"><i class="fas fa-file-shield"></i> الختم السيادي</div>
+        </div>
+        <div class="terminal-box" id="terminal"> [READY] بانتظار الملف... </div>
     </aside>
 
-    <main class="workspace">
-        <header class="header-nav">
-            <h2 style="color: var(--nexa-gold); letter-spacing: 4px;">NEXA GLOBAL MASTER</h2>
-            <button class="wallet-pill" id="walletBtn" onclick="connectWallet()">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg" width="20">
-                ربط المحفظة السيادية
-            </button>
-        </header>
-
-        <div class="vault-zone" onclick="document.getElementById('fIn').click()">
-            <i class="fa-solid fa-vault fa-4x" style="color: var(--nexa-prime); margin-bottom: 20px;"></i>
-            <h3 id="fName">إيداع المحتوى للختم السيادي</h3>
-            <p style="font-size: 12px; opacity: 0.5;">صور، فيديو، مستندات، صوت - سيتم تحويلها لـ .nxa</p>
-            <input type="file" id="fIn" hidden onchange="logFile(this)">
+    <main class="main-content">
+        <div class="action-header">
+            <div><i class="fas fa-network-wired" style="color: var(--primary);"></i> النظام نشط</div>
+            <button class="wallet-connector" id="walletBtn" onclick="connectWallet()">ربط المحفظة</button>
         </div>
 
-        <div class="nexa-inputs">
-            <div class="input-group">
-                <small style="color: var(--nexa-gold);">عنوان محفظة المستلم (اختياري)</small>
-                <input type="text" id="targetWallet" placeholder="0x... (للمشاركة المحددة)">
+        <div class="vault-upload" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-upload fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+            <h3 id="fileNameDisplay">اختر الملف المراد حمايته</h3>
+            <input type="file" id="fileInput" hidden onchange="handleFile(this)">
+        </div>
+
+        <div class="progress-wrapper" id="pWrapper"><div id="progress-bar"></div></div>
+
+        <button class="btn-execute" id="execBtn" onclick="initiateSovereignSeal()">تنفيذ الختم وتوليد الشهادة</button>
+
+        <section class="cloud-vault">
+            <h3 style="font-family: 'Orbitron'; color: var(--primary); font-size: 1rem;"><i class="fas fa-database"></i> الأرشيف السحابي (NEXA VAULT)</h3>
+            <div style="overflow-y: auto;">
+                <table class="vault-table">
+                    <thead>
+                        <tr>
+                            <th>اسم الملف</th>
+                            <th>التوقيع</th>
+                            <th>التاريخ</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vaultBody">
+                        </tbody>
+                </table>
             </div>
-            <div class="input-group">
-                <small style="color: var(--nexa-prime);">نطاق القفل الجغرافي</small>
-                <select id="geoLock" style="width: 100%; background: none; border: none; color: white;">
-                    <option value="global">عالمي (بدون قفل)</option>
-                    <option value="local">محلي (جهازي فقط)</option>
-                    <option value="region">إقليمي (الشرق الأوسط)</option>
-                </select>
-            </div>
-        </div>
-
-        <button class="btn-master" onclick="startNexaCore()">
-            <i class="fa-solid fa-gavel"></i> تنفيذ الختم السيادي الشامل
-        </button>
-
-        <div class="terminal" id="term">
-            [SYSTEM READY] نظام NEXA بانتظار الأوامر السيادية...
-        </div>
+        </section>
     </main>
-</div>
 
-<button class="panic-btn" onclick="globalPanic()"><i class="fa-solid fa-radiation"></i></button>
+    <script>
+        let userAddress = null;
+        let currentFileData = null;
 
-<canvas id="hiddenCanvas" style="display:none;"></canvas>
-
-<script>
-    let walletAddress = null;
-
-    function log(msg, type = 'safe') {
-        const t = document.getElementById('term');
-        const color = type === 'danger' ? 'var(--nexa-danger)' : 'var(--nexa-safe)';
-        t.innerHTML += `<div style="color:${color}">> ${new Date().toLocaleTimeString()}: ${msg}</div>`;
-        t.scrollTop = t.scrollHeight;
-    }
-
-    async function connectWallet() {
-        if (window.ethereum) {
-            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-            walletAddress = accounts[0];
-            document.getElementById('walletBtn').innerHTML = `<i class="fa-solid fa-user-shield"></i> ${walletAddress.substring(0,10)}...`;
-            log(`تم توثيق الاتصال بمحفظة: ${walletAddress}`);
-            document.getElementById('s3').classList.add('step-done');
-        } else {
-            alert("MetaMask مطلوب لتفعيل السيادة.");
-        }
-    }
-
-    function logFile(input) {
-        if(input.files[0]) {
-            document.getElementById('fName').innerText = `ملف مرصود: ${input.files[0].name}`;
-            log(`تم رصد ملف بتنسيق: ${input.files[0].type}. جاهز للتحويل لـ .nxa`);
-        }
-    }
-
-    async function startNexaCore() {
-        const file = document.getElementById('fIn').files[0];
-        if(!file || !walletAddress) return alert("يرجى ربط MetaMask واختيار الملف أولاً.");
-
-        log("بدء بروتوكول NEXA الشامل...");
-        
-        // محاكاة المراحل
-        const steps = ['s1', 's2', 's4', 's5'];
-        for(let s of steps) {
-            document.getElementById(s).classList.add('step-active');
-            log(`جاري تنفيذ: ${document.getElementById(s).innerText}...`);
-            await new Promise(r => setTimeout(r, 1500));
-            document.getElementById(s).classList.replace('step-active', 'step-done');
+        function log(msg) {
+            const t = document.getElementById('terminal');
+            t.innerHTML += `<div>> ${msg}</div>`;
+            t.scrollTop = t.scrollHeight;
         }
 
-        // توليد ملف .nxa
-        const nxaBlob = new Blob([file], { type: 'application/octet-stream' });
-        const url = URL.createObjectURL(nxaBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${file.name.split('.')[0]}.nxa`;
-        a.click();
-
-        log("✅ تم الختم السيادي بنجاح. الملف الآن بصيغة .nxa ومحمي عالمياً.", 'safe');
-        log("الرادار الآن يراقب أي محاولة رفع غير مصرح بها لهذا المحتوى.");
-    }
-
-    function globalPanic() {
-        if(confirm("تفعيل زر الطوارئ؟ سيتم تدمير كافة مفاتيح الوصول اللحظية.")) {
-            document.body.style.filter = "invert(1) grayscale(1)";
-            log("‼️ تم إرسال إشارة الإبطال لجميع المنصات العالمية.", 'danger');
-            alert("تم سحب السيادة. ملفاتك الآن مجرد ركام رقمي للآخرين.");
+        async function connectWallet() {
+            if (window.ethereum) {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const accounts = await provider.send("eth_requestAccounts", []);
+                userAddress = accounts[0];
+                document.getElementById('walletBtn').innerText = userAddress.substring(0,8) + "...";
+                document.getElementById('s3').classList.add('active');
+                log("تم الاتصال بالهوية الرقمية.");
+                loadVault();
+            }
         }
-    }
 
-    // منع التجسس التقليدي
-    document.addEventListener('keydown', e => {
-        if(e.ctrlKey && (e.key === 's' || e.key === 'u' || e.key === 'i')) {
-            e.preventDefault();
-            log("محاولة اختراق النظام محظورة سيادياً.", 'danger');
+        function handleFile(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('fileNameDisplay').innerText = file.name;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const hash = CryptoJS.SHA256(CryptoJS.lib.WordArray.create(e.target.result)).toString();
+                    currentFileData = { name: file.name, hash: hash, date: new Date().toLocaleDateString() };
+                    log("بصمة الملف جاهزة: " + hash.substring(0,16));
+                };
+                reader.readAsArrayBuffer(file);
+            }
         }
-    });
-</script>
 
+        async function initiateSovereignSeal() {
+            if (!userAddress || !currentFileData) return alert("يرجى ربط المحفظة واختيار ملف!");
+            
+            const btn = document.getElementById('execBtn');
+            const pWrapper = document.getElementById('pWrapper');
+            const pBar = document.getElementById('progress-bar');
+            
+            try {
+                log("بانتظار توقيع المستخدم...");
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const signature = await signer.signMessage(`NEXA_GENESIS_SEAL:${currentFileData.hash}`);
+                
+                btn.disabled = true;
+                pWrapper.style.display = 'block';
+                
+                for(let i=0; i<=100; i+=2) {
+                    pBar.style.width = i + "%";
+                    if(i==30) document.getElementById('s1').classList.add('active');
+                    if(i==60) document.getElementById('s2').classList.add('active');
+                    if(i==90) document.getElementById('s4').classList.add('active');
+                    await new Promise(r => setTimeout(r, 30));
+                }
+
+                saveToVault(currentFileData, signature);
+                generatePDF(currentFileData, signature);
+                
+                log("اكتمل الختم السيادي.");
+                btn.disabled = false;
+            } catch (e) { log("خطأ: " + e.message); btn.disabled = false; }
+        }
+
+        function saveToVault(fileData, sig) {
+            let vault = JSON.parse(localStorage.getItem('nexa_vault') || '[]');
+            vault.unshift({ ...fileData, signature: sig });
+            localStorage.setItem('nexa_vault', JSON.stringify(vault));
+            loadVault();
+        }
+
+        function loadVault() {
+            const vault = JSON.parse(localStorage.getItem('nexa_vault') || '[]');
+            const tbody = document.getElementById('vaultBody');
+            tbody.innerHTML = vault.map(item => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td style="font-family:monospace; font-size:0.7rem;">${item.signature.substring(0,20)}...</td>
+                    <td>${item.date}</td>
+                    <td><i class="fas fa-file-pdf action-icon" onclick="reDownload('${item.hash}')"></i></td>
+                </tr>
+            `).join('');
+        }
+
+        function reDownload(hash) {
+            const vault = JSON.parse(localStorage.getItem('nexa_vault') || '[]');
+            const item = vault.find(i => i.hash === hash);
+            if(item) generatePDF(item, item.signature);
+        }
+
+        function generatePDF(data, sig) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'l' });
+            doc.setFillColor(5, 10, 20); doc.rect(0, 0, 297, 210, 'F');
+            doc.setTextColor(0, 242, 255); doc.setFontSize(25);
+            doc.text("NEXA GLOBAL SOVEREIGN CERTIFICATE", 148, 40, {align:'center'});
+            doc.setTextColor(255); doc.setFontSize(12);
+            doc.text(`File Name: ${data.name}`, 40, 70);
+            doc.text(`SHA-256 Hash: ${data.hash}`, 40, 85);
+            doc.text(`Entity: ${userAddress}`, 40, 100);
+            doc.setFontSize(8); doc.setTextColor(150);
+            doc.text(`Digital Signature: ${sig}`, 40, 130, {maxWidth: 220});
+            doc.save(`NEXA_SEAL_${data.name}.pdf`);
+        }
+
+        window.onload = loadVault;
+    </script>
 </body>
 </html>
