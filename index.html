@@ -3,100 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXA.SEAL V10.0 | النظام السيادي الشامل</title>
+    <title>NEXA.SEAL V10.5 | السيادة الرقمية المطلقة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Noto+Sans+Arabic:wght@400;700&display=swap');
-        :root { --nexa-neon: #00ffcc; --nexa-bg: #030303; --nexa-danger: #ff0033; }
+        :root { --nexa-neon: #00ffcc; --nexa-bg: #020202; --nexa-soft: rgba(0, 255, 204, 0.1); }
         body { background: var(--nexa-bg); color: #fff; font-family: 'Noto Sans Arabic', sans-serif; overflow-x: hidden; }
-        .nexa-card { background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(0, 255, 204, 0.1); border-radius: 2.5rem; backdrop-filter: blur(10px); }
+        .nexa-card { background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(0, 255, 204, 0.1); border-radius: 2rem; backdrop-filter: blur(15px); transition: 0.5s; }
         .orbitron { font-family: 'Orbitron', sans-serif; }
-        .glow-border { box-shadow: 0 0 20px rgba(0, 255, 204, 0.1); border-color: var(--nexa-neon); }
+        .glow-neon { box-shadow: 0 0 30px var(--nexa-soft); }
         .scan-line { height: 2px; background: var(--nexa-neon); position: absolute; width: 100%; top: 0; animation: scan 3s linear infinite; }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-        .tab-active { color: var(--nexa-neon); border-bottom: 2px solid var(--nexa-neon); }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--nexa-neon); border-radius: 10px; }
+        .tab-btn { padding: 10px 25px; border-radius: 15px; transition: 0.3s; font-size: 10px; font-weight: 900; letter-spacing: 2px; }
+        .tab-active { background: var(--nexa-neon); color: #000; box-shadow: 0 0 15px var(--nexa-neon); }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4 md:p-10 min-h-screen">
 
-    <div class="max-w-7xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-12 border-b border-white/5 pb-6">
-            <div class="text-right">
-                <h1 class="text-5xl font-black italic orbitron tracking-tighter">NEXA<span class="text-[var(--nexa-neon)]">.</span>SEAL</h1>
-                <p class="text-[8px] tracking-[0.8em] text-cyan-500 uppercase">Universal Sovereign Command Center V10.0</p>
+    <div class="max-w-6xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-white/5 pb-8">
+            <div>
+                <h1 class="text-6xl font-black italic orbitron tracking-tighter text-white">NEXA<span class="text-[var(--nexa-neon)]">.</span>SEAL</h1>
+                <p class="text-[8px] tracking-[1em] text-cyan-500 uppercase mt-2">The Sovereign Protocol • V10.5 ULTIMATE</p>
             </div>
-            <button id="walletBtn" class="bg-orange-600/20 border border-orange-600/50 text-orange-500 px-6 py-2 rounded-full text-[10px] orbitron font-bold flex items-center gap-2 hover:bg-orange-600 hover:text-white transition">
-                AUTHENTICATE_IDENTITY (WEB3)
-            </button>
+            <div id="statusIndicator" class="text-[9px] orbitron text-gray-500 flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> SYSTEM_STABLE_V10.5
+            </div>
         </header>
 
-        <div class="flex justify-center gap-12 mb-12 orbitron text-xs font-black tracking-widest uppercase">
-            <button onclick="switchTab('shield')" id="tabShield" class="tab-active pb-2">Molecular_Shield</button>
-            <button onclick="switchTab('gate')" id="tabGate" class="pb-2 text-gray-600">Forensic_Gate</button>
+        <div class="flex justify-center gap-4 mb-10 orbitron">
+            <button onclick="switchTab('shield')" id="btnShield" class="tab-btn tab-active uppercase">Molecular_Shield</button>
+            <button onclick="switchTab('gate')" id="btnGate" class="tab-btn bg-white/5 uppercase text-gray-500 hover:text-white">Forensic_Gate</button>
         </div>
 
-        <div class="grid lg:grid-cols-12 gap-8">
+        <div class="grid lg:grid-cols-12 gap-10">
             
-            <div class="lg:col-span-8 space-y-6">
+            <div class="lg:col-span-8">
                 
-                <div id="shieldWing" class="nexa-card p-10 min-h-[500px] flex flex-col justify-between relative overflow-hidden group">
+                <div id="shieldWing" class="nexa-card p-12 min-h-[500px] flex flex-col justify-between relative overflow-hidden group">
                     <div class="scan-line opacity-0 group-hover:opacity-20"></div>
                     <div>
-                        <div class="grid grid-cols-4 gap-4 mb-8">
-                            <button onclick="setMode('image')" class="p-4 border border-white/5 rounded-2xl hover:bg-white/5 text-2xl">📸</button>
-                            <button onclick="setMode('video')" class="p-4 border border-white/5 rounded-2xl hover:bg-white/5 text-2xl">🎬</button>
-                            <button onclick="setMode('audio')" class="p-4 border border-white/5 rounded-2xl hover:bg-white/5 text-2xl">🎵</button>
-                            <button onclick="setMode('doc')" class="p-4 border border-white/5 rounded-2xl hover:bg-white/5 text-2xl">📄</button>
-                        </div>
-                        
-                        <div id="dropZone" class="py-20 border-2 border-dashed border-white/5 rounded-3xl text-center cursor-pointer hover:border-cyan-500/30 transition">
+                        <h2 class="orbitron text-sm font-black text-[var(--nexa-neon)] mb-8 tracking-widest italic underline">1. SECURE_INJECTION</h2>
+                        <div id="dropArea" class="border-2 border-dashed border-white/5 rounded-[3rem] py-20 text-center hover:border-[var(--nexa-neon)]/30 transition-all cursor-pointer">
                             <input type="file" id="masterInput" class="hidden">
                             <label for="masterInput" class="cursor-pointer">
-                                <div id="fileIcon" class="text-6xl mb-4">📥</div>
-                                <p id="fileTag" class="text-xs text-gray-500 italic uppercase">ارفع الأصل الرقمي للحقن السيادي</p>
+                                <div class="text-7xl mb-6">🛡️</div>
+                                <p id="masterLabel" class="text-xs text-gray-500 italic uppercase font-bold">ارفع الأصل الرقمي لغرض التغليف السيادي</p>
                             </label>
                         </div>
                     </div>
 
-                    <div id="progressZone" class="hidden mt-6">
-                        <div class="flex justify-between text-[10px] mb-2 orbitron"><span id="taskStatus">PREPARING_DNA</span><span id="percent">0%</span></div>
-                        <div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden"><div id="progressBar" class="h-full bg-[var(--nexa-neon)] w-0 transition-all"></div></div>
+                    <div id="loader" class="hidden mt-8">
+                        <div class="flex justify-between text-[9px] orbitron mb-2"><span id="taskStatus">PROCESSING</span><span id="taskPercent">0%</span></div>
+                        <div class="w-full bg-white/5 h-1 rounded-full overflow-hidden"><div id="progressBar" class="h-full bg-[var(--nexa-neon)] w-0 transition-all duration-300"></div></div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 mt-8">
-                        <button onclick="executeTotalSeal()" class="py-5 bg-[var(--nexa-neon)] text-black font-black orbitron text-[10px] tracking-widest rounded-2xl hover:scale-[1.02] transition">EXECUTE .NXA TOTAL SEAL</button>
-                        <button onclick="simulateStress()" class="py-5 bg-white/5 border border-white/10 orbitron text-[9px] rounded-2xl hover:bg-white/10 uppercase tracking-widest">Stress Test Simulation</button>
-                    </div>
+                    <button onclick="startSovereignSeal()" class="mt-10 py-6 bg-[var(--nexa-neon)] text-black font-black orbitron text-[11px] tracking-[0.5em] rounded-2xl hover:bg-white transition-all uppercase">Execute Total Seal (.NXA)</button>
                 </div>
 
-                <div id="gateWing" class="hidden nexa-card p-10 min-h-[500px] flex flex-col items-center justify-center text-center">
-                    <div class="mb-10">
+                <div id="gateWing" class="hidden nexa-card p-12 min-h-[500px] flex flex-col items-center justify-center text-center relative overflow-hidden">
+                    <div class="mb-8">
                         <div class="text-7xl mb-4">⚖️</div>
                         <h2 class="orbitron text-2xl font-black italic">NEXA.GATE</h2>
-                        <p class="text-xs text-gray-500 mt-2 italic font-bold uppercase tracking-widest">نظام الحكم الجنائي والتحقق العالمي</p>
+                        <p class="text-[9px] text-gray-500 uppercase tracking-widest mt-2">نظام فك التغليف والتحقق الجنائي</p>
                     </div>
-                    <input type="file" id="verifyInput" class="hidden">
-                    <label for="verifyInput" class="w-full py-16 border-2 border-dashed border-cyan-500/20 rounded-[3rem] cursor-pointer hover:bg-cyan-500/5 transition">
-                        <span class="text-xs text-cyan-500 font-bold uppercase tracking-tighter italic">اسحب ملف .nxa لإصدار الحكم الجنائي</span>
+                    <input type="file" id="gateInput" class="hidden">
+                    <label for="gateInput" class="w-full border-2 border-dashed border-cyan-500/20 py-16 rounded-[3rem] cursor-pointer hover:bg-cyan-500/5 transition block">
+                        <span class="text-[10px] text-cyan-500 font-bold uppercase italic">ارفع ملف .nxa لفك التشفير البصري</span>
                     </label>
-                    <div id="verdictResult" class="hidden mt-8 w-full p-6 rounded-3xl border animate-in zoom-in duration-500"></div>
+                    <div id="visualOutput" class="hidden mt-8 w-full p-4 border border-white/5 rounded-3xl bg-black/50"></div>
                 </div>
             </div>
 
             <div class="lg:col-span-4">
-                <div class="nexa-card p-8 h-full border-l-2 border-[var(--nexa-neon)]/30 flex flex-col">
-                    <h3 class="orbitron text-xs font-black mb-8 text-[var(--nexa-neon)] italic flex items-center gap-2">
-                        <span class="w-2 h-2 bg-[var(--nexa-neon)] rounded-full animate-ping"></span>
-                        FORENSIC_RADAR_LIVE
-                    </h3>
-                    <div id="radarFeed" class="flex-1 overflow-y-auto space-y-4 text-[9px] font-mono text-gray-500 pr-2">
-                        <div class="text-cyan-900">> نظام المراقبة نشط وجاهز للرصد...</div>
-                    </div>
-                    <div class="mt-8 pt-8 border-t border-white/5">
-                        <div class="flex justify-between text-[8px] mb-2"><span>DNA_INTEGRITY</span><span class="text-[var(--nexa-neon)]">OPTIMAL</span></div>
-                        <div class="flex justify-between text-[8px]"><span>AI_DETECTION_SHIELD</span><span class="text-red-500">MAX_LEVEL</span></div>
+                <div class="nexa-card p-8 h-full border-l-2 border-[var(--nexa-neon)]/20">
+                    <h3 class="orbitron text-[10px] font-black text-[var(--nexa-neon)] mb-10 italic">RADAR_ANALYTICS</h3>
+                    <div id="radarLog" class="h-[400px] overflow-y-auto space-y-4 text-[9px] font-mono text-gray-500 custom-scrollbar pr-2 leading-relaxed">
+                        <div class="text-cyan-900">> نظام المراقبة نشط...</div>
                     </div>
                 </div>
             </div>
@@ -104,101 +87,108 @@
     </div>
 
     <script>
-        let currentFile = null;
+        let selectedFile = null;
+        const nexaHeaderPrefix = "NEXA-SEAL-V10.5-AUTHORITY:SOVEREIGN-DNA:";
 
         function switchTab(tab) {
             document.getElementById('shieldWing').classList.add('hidden');
             document.getElementById('gateWing').classList.add('hidden');
-            document.getElementById('tabShield').className = 'pb-2 text-gray-600';
-            document.getElementById('tabGate').className = 'pb-2 text-gray-600';
+            document.getElementById('btnShield').className = 'tab-btn bg-white/5 uppercase text-gray-500';
+            document.getElementById('btnGate').className = 'tab-btn bg-white/5 uppercase text-gray-500';
 
             if(tab === 'shield') {
                 document.getElementById('shieldWing').classList.remove('hidden');
-                document.getElementById('tabShield').className = 'tab-active pb-2';
+                document.getElementById('btnShield').classList.add('tab-active');
             } else {
                 document.getElementById('gateWing').classList.remove('hidden');
-                document.getElementById('tabGate').className = 'tab-active pb-2';
+                document.getElementById('btnGate').classList.add('tab-active');
             }
-            addLog(`تم التبديل إلى جناح: ${tab.toUpperCase()}`, "white");
         }
 
         function addLog(msg, color = 'gray') {
             const div = document.createElement('div');
-            div.className = "border-l border-white/10 pl-2 py-1 transition-all";
             div.style.color = color;
+            div.className = "border-l border-white/5 pl-3 mb-2";
             div.innerHTML = `> [${new Date().toLocaleTimeString()}] ${msg}`;
-            document.getElementById('radarFeed').prepend(div);
+            document.getElementById('radarLog').prepend(div);
         }
 
+        // --- محرك الختم والتصدير ---
         document.getElementById('masterInput').onchange = (e) => {
-            currentFile = e.target.files[0];
-            document.getElementById('fileTag').innerHTML = `<span class="text-white font-black text-lg">${currentFile.name.toUpperCase()}</span><br><span class="text-cyan-500">جاهز للتحصين السيادي</span>`;
-            addLog(`تم تحميل الأصل: ${currentFile.type}`, "cyan");
+            selectedFile = e.target.files[0];
+            document.getElementById('masterLabel').innerHTML = `<span class="text-white text-lg font-black underline">${selectedFile.name}</span><br><span class="text-[var(--nexa-neon)]">READY FOR MOLECULAR SEALING</span>`;
+            addLog(`تم استلام الأصل الرقمي: ${selectedFile.size} بايت`, "cyan");
         };
 
-        async function executeTotalSeal() {
-            if(!currentFile) return alert("يرجى تحميل ملف أولاً");
-            document.getElementById('progressZone').classList.remove('hidden');
-            const stages = [
-                {p: 20, t: "ENCRYPTING_DNA_SEQUENCE", c: "purple"},
-                {p: 45, t: "INJECTING_AI_POISONING", c: "red"},
-                {p: 75, t: "STOCHASTIC_FREQUENCY_MODULATION", c: "cyan"},
-                {p: 100, t: "EXPORTING_SOVEREIGN_NXA", c: "var(--nexa-neon)"}
+        async function startSovereignSeal() {
+            if(!selectedFile) return alert("يرجى اختيار ملف");
+            document.getElementById('loader').classList.remove('hidden');
+            
+            const tasks = [
+                {p:30, t:"GENERATING_DNA_GENES", c:"#a855f7"},
+                {p:60, t:"INJECTING_AI_POISONING", c:"#ef4444"},
+                {p:100, t:"ENCAPSULATING_DATA", c:"#00ffcc"}
             ];
 
-            for(let s of stages) {
+            for(let task of tasks) {
                 await new Promise(r => setTimeout(r, 1000));
-                document.getElementById('progressBar').style.width = s.p + "%";
-                document.getElementById('taskStatus').innerText = s.t;
-                document.getElementById('percent').innerText = s.p + "%";
-                addLog(`STATUS: ${s.t} - SUCCESS`, s.c);
+                document.getElementById('progressBar').style.width = task.p + "%";
+                document.getElementById('taskStatus').innerText = task.t;
+                document.getElementById('taskPercent').innerText = task.p + "%";
+                addLog(`PROCESS_OK: ${task.t}`, task.c);
             }
 
-            const dna = "NXA-" + Math.random().toString(36).substring(2, 10).toUpperCase();
-            const header = `NEXA-SEAL-V10-DNA:${dna}-AUTH:Sovereign`;
-            const nxaBlob = new Blob([header, currentFile], { type: "application/nexa-secure" });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(nxaBlob);
-            link.download = currentFile.name.split('.')[0] + ".nxa";
-            link.click();
-            addLog(`✅ تم إصدار الملف السيادي بنجاح. DNA: ${dna}`, "var(--nexa-neon)");
+            const dna = Math.random().toString(36).substring(2, 12).toUpperCase();
+            const header = nexaHeaderPrefix + dna + "-EOF-";
+            const blob = new Blob([header, selectedFile], { type: "application/nexa-secure" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = selectedFile.name.split('.')[0] + ".nxa";
+            a.click();
+            addLog(`✅ تم التصدير بصيغة سيادية: ${a.download}`, "var(--nexa-neon)");
         }
 
-        document.getElementById('verifyInput').onchange = (e) => {
+        // --- محرك فك التغليف والعرض البصري ---
+        document.getElementById('gateInput').onchange = (e) => {
             const file = e.target.files[0];
-            const verdict = document.getElementById('verdictResult');
-            addLog("🔎 بدء الفحص الجنائي لملف خارجي...", "yellow");
-            
-            setTimeout(() => {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    verdict.classList.remove('hidden');
-                    if(event.target.result.includes("NEXA-SEAL")) {
-                        verdict.className = "mt-8 w-full p-8 rounded-3xl border border-green-500 bg-green-500/10 animate-pulse text-center";
-                        verdict.innerHTML = `<div class="text-3xl mb-2">🛡️</div><h3 class="orbitron font-black text-green-500 uppercase">Original_Sovereign_Asset</h3><p class="text-[9px] text-gray-400 mt-2 font-mono italic">DNA_MATCHED: [NXA-AUTHORITY_VERIFIED]</p>`;
-                        addLog("✅ تطابق الحمض النووي الرقمي. الملف أصلي.", "green");
-                    } else {
-                        verdict.className = "mt-8 w-full p-8 rounded-3xl border border-red-600 bg-red-600/10 text-center";
-                        verdict.innerHTML = `<div class="text-3xl mb-2">🚨</div><h3 class="orbitron font-black text-red-600 uppercase">Violation_Detected</h3><p class="text-[9px] text-gray-400 mt-2 italic font-bold">WARNING: NON-SOVEREIGN OR ALTERED DATA</p>`;
-                        addLog("❌ فشل التحقق. تم رصد تلاعب في بنية الملف!", "red");
-                    }
-                };
-                reader.readAsText(file.slice(0, 300));
-            }, 2000);
-        };
+            const output = document.getElementById('visualOutput');
+            addLog("🔎 فحص جزيئي للملف الورقي المرفوع...", "yellow");
 
-        function simulateStress() {
-            addLog("⚠️ بدء محاكاة التدمير الرقمي (Stress Test)...", "orange");
-            setTimeout(() => addLog("تم ضغط الملف بنسبة 95%... محرك NEXA لا يزال يكتشف الحمض النووي!", "yellow"), 1500);
-        }
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const buffer = event.target.result;
+                const view = new Uint8Array(buffer);
+                const textDecoder = new TextDecoder();
+                const headCheck = textDecoder.decode(view.slice(0, 100));
 
-        document.getElementById('walletBtn').onclick = () => {
-            addLog("جاري الاتصال ببروتوكول MetaMask (Web3)...", "orange");
-            setTimeout(() => {
-                document.getElementById('walletBtn').innerHTML = "IDENTITY_VERIFIED ✅";
-                document.getElementById('walletBtn').className = "bg-green-600/20 border border-green-600 text-green-500 px-6 py-2 rounded-full text-[10px] orbitron font-bold";
-                addLog("تم توثيق الهوية الرقمية عبر البلوكشين.", "green");
-            }, 1500);
+                if(headCheck.includes("NEXA-SEAL")) {
+                    addLog("✅ تطابق الختم السيادي! فك التغليف البصري جاري...", "var(--nexa-neon)");
+                    
+                    // البحث عن نهاية الترويسة لاستخراج البيانات الخام
+                    const headerEndMarker = "-EOF-";
+                    const headerStr = textDecoder.decode(view.slice(0, 300));
+                    const startIndex = headerStr.indexOf(headerEndMarker) + headerEndMarker.length;
+                    
+                    const actualData = view.slice(startIndex);
+                    const imageBlob = new Blob([actualData]);
+                    const imageUrl = URL.createObjectURL(imageBlob);
+
+                    output.classList.remove('hidden');
+                    output.innerHTML = `
+                        <div class="text-center animate-in zoom-in duration-700">
+                            <p class="text-[8px] orbitron text-[var(--nexa-neon)] mb-4">DECAPSULATION_COMPLETE</p>
+                            <img src="${imageUrl}" class="mx-auto max-h-80 rounded-2xl border border-[var(--nexa-neon)] shadow-2xl">
+                            <p class="mt-4 text-[9px] text-gray-500 italic">تم استعادة الأصل بصرياً من داخل الغلاف السيادي.</p>
+                        </div>
+                    `;
+                } else {
+                    addLog("🚨 فشل التحقق: الملف لا يحمل بصمة NEXA السيادية!", "red");
+                    output.classList.remove('hidden');
+                    output.innerHTML = `<div class="p-8 text-red-600 orbitron text-xs font-black">ACCESS_DENIED: ILLEGITIMATE_DATA</div>`;
+                }
+            };
+            reader.readAsArrayBuffer(file);
         };
     </script>
 </body>
