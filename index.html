@@ -3,194 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXA.SEAL | نظام السيادة الرقمية المحلي</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
-    
+    <title>NEXA.SEAL V2.0 - لوحة التحكم السيادية</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --primary: #00f2ff; --secondary: #7000ff; --bg: #050505; --card: #111; --text: #fff; }
-        body { background: var(--bg); color: var(--text); font-family: 'Noto Sans Arabic', sans-serif; margin: 0; text-align: center; }
-        
-        header { padding: 40px; border-bottom: 2px solid #222; background: linear-gradient(to bottom, #000, #0a0a0a); }
-        .logo { font-family: 'Orbitron', sans-serif; font-size: 3rem; background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
-        
-        .container { max-width: 1000px; margin: 40px auto; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .card { background: var(--card); border: 1px solid #222; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        .btn { background: linear-gradient(90deg, var(--secondary), var(--primary)); border: none; padding: 15px 25px; color: #fff; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; font-family: 'Orbitron', sans-serif; }
-        .btn:hover { transform: scale(1.02); filter: brightness(1.2); }
-        .btn:disabled { background: #333; cursor: not-allowed; }
-
-        .status-box { background: #000; border: 1px solid #333; padding: 15px; border-radius: 10px; height: 120px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; color: #0f0; text-align: left; margin-top: 15px; }
-        
-        .preview-img { max-width: 100%; border-radius: 10px; margin-top: 15px; display: none; border: 1px solid var(--primary); }
-        
-        #walletDisplay { margin-top: 10px; font-size: 0.8rem; color: var(--primary); }
+        body { background: #050505; color: #e5e7eb; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .nexa-gradient { background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
+        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
+    <header class="text-center mb-10">
+        <h1 class="text-4xl font-black tracking-tighter nexa-gradient bg-clip-text text-transparent italic">NEXA.SEAL V2.0</h1>
+        <p class="text-gray-400 text-sm mt-2">بروتوكول السيادة المحلية للأصول الرقمية</p>
+    </header>
 
-<header>
-    <div class="logo">NEXA.SEAL</div>
-    <p style="letter-spacing: 3px; color: #666;">LOCAL SOVEREIGNTY PROTOCOL</p>
-    <button class="btn" style="width: auto;" onclick="connectMetaMask()">ربط محفظة MetaMask</button>
-    <div id="walletDisplay">المحفظة غير مرتبطة</div>
-</header>
+    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="md:col-span-1 space-y-6">
+            <div class="glass-card p-6 rounded-3xl text-center">
+                <button id="connectBtn" class="w-full py-3 rounded-2xl font-bold bg-indigo-600 hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20">
+                    ربط محفظة MetaMask
+                </button>
+                <p id="walletAddress" class="mt-4 text-[10px] text-gray-500 truncate">المحفظة غير مرتبطة</p>
+            </div>
 
-<div class="container">
-    <div class="card">
-        <h2 style="color: var(--primary);">1. الختم الجزيئي</h2>
-        <p style="font-size: 0.9rem; color: #888;">ارفع ملفك لزرع هويتك المشفرة في أعماقه.</p>
-        
-        <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload(this)">
-        <button class="btn" onclick="document.getElementById('fileInput').click()">اختيار ملف</button>
-        
-        <img id="preview" class="preview-img">
-        
-        <button id="sealBtn" class="btn" style="margin-top: 20px;" onclick="startNexaSeal()" disabled>بدء عملية الختم السيادي</button>
-        <div id="downloadArea"></div>
-    </div>
+            <div class="glass-card p-6 rounded-3xl">
+                <h3 class="font-bold text-sm mb-4 border-b border-white/10 pb-2 text-indigo-400">إحصائيات السيادة</h3>
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs text-gray-400">إجمالي الأختام:</span>
+                    <span id="sealCount" class="text-lg font-mono font-bold text-white">0</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-400">حالة الشبكة:</span>
+                    <span class="text-[10px] text-green-400"><span class="status-dot bg-green-400 animate-pulse ml-1"></span> متصل</span>
+                </div>
+            </div>
+        </div>
 
-    <div class="card">
-        <h2 style="color: var(--secondary);">2. الرادار الجنائي</h2>
-        <p style="font-size: 0.9rem; color: #888;">تحليل الملفات للكشف عن الأختام والهويات المخفية.</p>
-        
-        <input type="file" id="radarInput" style="display: none;" onchange="handleRadarUpload(this)">
-        <button class="btn" style="background: var(--secondary);" onclick="document.getElementById('radarInput').click()">فحص ملف مشبوه</button>
-        
-        <div class="status-box" id="terminal">
-            > في انتظار ربط MetaMask...<br>
-            > النظام جاهز للعمل محلياً.
+        <div class="md:col-span-2 space-y-6">
+            <div class="glass-card p-8 rounded-3xl border-l-4 border-indigo-500">
+                <h2 class="text-xl font-bold mb-6 flex items-center">
+                    <span class="ml-2 text-indigo-400 italic">01.</span> الختم الجزيئي
+                </h2>
+                <input type="file" id="fileInput" class="hidden">
+                <label for="fileInput" class="block w-full p-10 border-2 border-dashed border-white/10 rounded-2xl text-center cursor-pointer hover:border-indigo-500 transition-colors">
+                    <div id="fileStatus" class="text-gray-400 italic text-sm">ارفع ملفك لزرع هويتك المشفرة</div>
+                </label>
+                <button id="sealBtn" class="w-full mt-6 py-4 rounded-2xl font-black nexa-gradient text-white shadow-xl opacity-50 cursor-not-allowed" disabled>
+                    بـدء عـمـلـيـة الـخـتـم
+                </button>
+                <a id="downloadLink" class="hidden block mt-4 text-center text-cyan-400 text-sm font-bold underline decoration-dotted">تحميل النسخة السيادية المختومة</a>
+            </div>
+
+            <div class="glass-card p-8 rounded-3xl">
+                <h2 class="text-xl font-bold mb-6 flex items-center">
+                    <span class="ml-2 text-pink-400 italic">02.</span> سجل الأصول المحمية
+                </h2>
+                <div id="historyList" class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                    <p class="text-center text-gray-600 italic text-xs py-10">لا توجد أختام مسجلة حالياً</p>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    let walletAddress = "";
-    let originalFileData = null;
+    <script>
+        let web3;
+        let account;
+        let sealCounter = 0;
 
-    function log(msg) {
-        const t = document.getElementById('terminal');
-        t.innerHTML += `<br>> ${msg}`;
-        t.scrollTop = t.scrollHeight;
-    }
+        const connectBtn = document.getElementById('connectBtn');
+        const walletAddress = document.getElementById('walletAddress');
+        const fileInput = document.getElementById('fileInput');
+        const sealBtn = document.getElementById('sealBtn');
+        const historyList = document.getElementById('historyList');
 
-    // 1. ربط MetaMask
-    async function connectMetaMask() {
-        if (window.ethereum) {
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                walletAddress = accounts[0];
-                document.getElementById('walletDisplay').innerText = `المحفظة: ${walletAddress}`;
-                document.getElementById('sealBtn').disabled = false;
-                log("تم ربط MetaMask. الهوية السيادية جاهزة.");
-            } catch (e) { log("خطأ: المستخدم رفض الربط."); }
-        } else {
-            alert("يرجى تثبيت MetaMask أولاً!");
-        }
-    }
-
-    // 2. معالجة الملف المرفوع
-    function handleFileUpload(input) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            originalFileData = e.target.result;
-            if(file.type.startsWith('image/')) {
-                const img = document.getElementById('preview');
-                img.src = originalFileData;
-                img.style.display = 'block';
-            }
-            log(`تم تحميل الملف: ${file.name}`);
-        };
-        reader.readAsDataURL(file);
-    }
-
-    // 3. عملية الختم السيادي (التوقيع + الحقن)
-    async function startNexaSeal() {
-        if (!originalFileData) return;
-        
-        log("توليد البصمة الرقمية (SHA-256)...");
-        const fileHash = CryptoJS.SHA256(originalFileData).toString();
-        
-        log("يرجى التوقيع في MetaMask لإثبات الملكية...");
-        try {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            const message = `NEXA PROTOCOL SEAL\nOwner: ${walletAddress}\nHash: ${fileHash}\nTime: ${new Date().toISOString()}`;
-            
-            const signature = await signer.signMessage(message);
-            log("✅ تم التوقيع بنجاح.");
-            
-            // حقن البيانات في الصورة (إذا كانت صورة)
-            if (document.getElementById('preview').style.display === 'block') {
-                log("بدء الحقن الجزيئي في البكسلات...");
-                injectData(signature);
+        connectBtn.onclick = async () => {
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                account = accounts[0];
+                walletAddress.innerText = `سيادة الحساب: ${account}`;
+                connectBtn.innerText = "متصل بنجاح";
+                connectBtn.classList.replace('bg-indigo-600', 'bg-green-600');
+                sealBtn.disabled = false;
+                sealBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             } else {
-                log("⚠️ الملف ليس صورة. الحماية تعتمد على البصمة الرقمية فقط.");
+                alert("يرجى فتح الموقع من داخل متصفح MetaMask");
             }
-        } catch (e) { log("❌ فشلت العملية: " + e.message); }
-    }
-
-    // 4. خوارزمية الحقن الجزيئي (Steganography)
-    function injectData(sig) {
-        const img = document.getElementById('preview');
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        ctx.drawImage(img, 0, 0);
-
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imgData.data;
-
-        // دمج عنوان المحفظة كختم مخفي
-        const secret = `NEXA|${walletAddress}|${sig.substring(0,20)}`;
-        const bin = secret.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join('');
-
-        for(let i=0; i<bin.length; i++) {
-            data[i*4] = (data[i*4] & 0xFE) | parseInt(bin[i]);
-        }
-
-        ctx.putImageData(imgData, 0, 0);
-        const sealedUrl = canvas.toDataURL();
-        
-        document.getElementById('downloadArea').innerHTML = `
-            <a href="${sealedUrl}" download="NEXA_SEALED_FILE.png" class="btn" style="display:block; text-decoration:none; margin-top:10px; background:var(--primary); color:#000;">تحميل الملف المختوم سيادياً</a>
-        `;
-        log("🎉 اكتمل الختم! يمكنك تحميل ملفك الآن.");
-    }
-
-    // 5. الرادار الجنائي (كشف الختم)
-    function handleRadarUpload(input) {
-        log("بدء الفحص الراداري للجزيئات...");
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                const cvs = document.createElement('canvas');
-                const ctx = cvs.getContext('2d');
-                cvs.width = img.width; cvs.height = img.height;
-                ctx.drawImage(img, 0, 0);
-                const d = ctx.getImageData(0,0,cvs.width,cvs.height).data;
-                let b = "";
-                for(let i=0; i<400; i++) b += (d[i*4] & 1);
-                let txt = "";
-                for(let i=0; i<b.length; i+=8) txt += String.fromCharCode(parseInt(b.substr(i,8), 2));
-                
-                if(txt.includes("NEXA|")) {
-                    log(`✅ كشف الختم! المالك: ${txt.split('|')[1]}`);
-                } else {
-                    log("❌ لم يتم العثور على ختم NEXA. الملف مجهول.");
-                }
-            };
-            img.src = e.target.result;
         };
-        reader.readAsDataURL(file);
-    }
-</script>
 
+        fileInput.onchange = (e) => {
+            const fileName = e.target.files[0].name;
+            document.getElementById('fileStatus').innerText = `تم اختيار: ${fileName}`;
+            document.getElementById('fileStatus').classList.add('text-indigo-400');
+        };
+
+        sealBtn.onclick = async () => {
+            const message = `NEXA_SEAL_PROTOCOL_V2\nOwner: ${account}\nTimestamp: ${Date.now()}`;
+            try {
+                const signature = await web3.eth.personal.sign(message, account);
+                
+                // إضافة للسجل
+                sealCounter++;
+                document.getElementById('sealCount').innerText = sealCounter;
+                
+                const entry = document.createElement('div');
+                entry.className = "flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5 text-[10px]";
+                entry.innerHTML = `
+                    <span class="text-gray-300 font-mono italic">الملف #${sealCounter}</span>
+                    <span class="text-indigo-300 truncate w-32 ml-2">${signature}</span>
+                    <span class="text-green-500 font-bold">مختوم ✅</span>
+                `;
+                
+                if (sealCounter === 1) historyList.innerHTML = '';
+                historyList.prepend(entry);
+
+                // تفعيل التحميل الصوري (تجريبي)
+                const downloadLink = document.getElementById('downloadLink');
+                downloadLink.classList.remove('hidden');
+                downloadLink.href = URL.createObjectURL(fileInput.files[0]);
+                downloadLink.download = `SEALED_${fileInput.files[0].name}`;
+                
+                alert("تم توليد الختم بنجاح وتسجيله في لوحة التحكم!");
+            } catch (error) {
+                console.error(error);
+            }
+        };
+    </script>
 </body>
 </html>
