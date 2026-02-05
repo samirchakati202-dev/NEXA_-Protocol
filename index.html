@@ -3,238 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEXA GLOBAL | OMNI-SYSTEM V100</title>
+    <title>NEXA GLOBAL | OMNI-SYSTEM V120</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --cyan: #00f2ff; --deep: #010413; --green: #00ffaa;
-            --red: #ff2d55; --amber: #ffb100; --glass: rgba(15, 23, 42, 0.98);
+            --red: #ff2d55; --royal: #4169e1; --amber: #ffb100; --glass: rgba(15, 23, 42, 0.98);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--deep); font-family: 'Cairo', sans-serif; color: white; overflow-x: hidden; padding-bottom: 30px; }
+        body { background: var(--deep); font-family: 'Cairo', sans-serif; color: white; overflow-x: hidden; padding-bottom: 50px; }
 
-        /* --- الهيدر السيادي --- */
-        .nexa-header { 
-            padding: 25px; text-align: center; border-bottom: 2px solid var(--cyan); 
-            background: linear-gradient(to bottom, #0a0f25, var(--deep));
-            box-shadow: 0 5px 20px rgba(0, 242, 255, 0.1);
+        /* --- شريط الشبكة السيادية --- */
+        .nexa-bar {
+            background: rgba(0,242,255,0.05); padding: 12px; font-size: 0.65rem; 
+            display: flex; justify-content: space-between; border-bottom: 1px solid var(--cyan);
+            font-family: 'Orbitron';
         }
-        .nexa-header h1 { font-family: 'Orbitron'; letter-spacing: 5px; color: var(--cyan); text-shadow: 0 0 15px var(--cyan); font-size: 1.5rem; }
 
-        /* --- الرادار الجنائي الشامل --- */
-        .radar-zone { padding: 40px 20px; text-align: center; position: relative; }
-        .radar-scanner {
+        /* --- رادار التدقيق الجنائي --- */
+        .radar-zone { padding: 40px 20px; text-align: center; }
+        .radar-disc {
             width: 200px; height: 200px; border-radius: 50%; border: 4px solid var(--cyan);
-            margin: 0 auto; position: relative; display: flex; align-items: center; justify-content: center;
-            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0 auto; display: flex; align-items: center; justify-content: center;
+            position: relative; transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 30px rgba(0,242,255,0.1);
         }
-        .scan-line { 
-            position: absolute; width: 100%; height: 4px; background: var(--cyan); 
-            top: 0; animation: scanMove 3s linear infinite; box-shadow: 0 0 15px var(--cyan); 
+        .scan-line {
+            position: absolute; width: 100%; height: 4px; background: var(--cyan);
+            top: 0; animation: scanMove 3s linear infinite; box-shadow: 0 0 15px var(--cyan);
         }
         @keyframes scanMove { 0%, 100% { top: 0%; } 50% { top: 100%; } }
 
-        /* --- حالات الرادار --- */
-        .status-safe { border-color: var(--green) !important; box-shadow: 0 0 50px var(--green) !important; }
-        .status-danger { border-color: var(--red) !important; box-shadow: 0 0 70px var(--red) !important; animation: shake 0.2s infinite; }
-        @keyframes shake { 0% { transform: translate(1px,1px); } 50% { transform: translate(-1px,-1px); } }
+        /* حالات الرادار */
+        .status-verified { border-color: var(--royal) !important; box-shadow: 0 0 50px var(--royal) !important; }
+        .status-alert { border-color: var(--red) !important; box-shadow: 0 0 60px var(--red) !important; animation: shake 0.3s infinite; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-        /* --- لوحة التحكم (Action Hub) --- */
-        .dashboard { display: flex; gap: 15px; padding: 20px; }
-        .dash-btn { 
-            flex: 1; background: var(--glass); border: 1px solid var(--cyan); padding: 18px; 
-            border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s;
-            color: var(--cyan); font-weight: 900;
+        /* --- لوحة التحكم --- */
+        .action-hub { display: flex; gap: 12px; padding: 20px; }
+        .nexa-btn {
+            flex: 1; padding: 18px; border-radius: 20px; border: 1px solid var(--cyan);
+            background: var(--glass); color: var(--cyan); font-weight: 900; 
+            cursor: pointer; transition: 0.3s; text-align: center;
         }
-        .dash-btn i { font-size: 1.6rem; margin-bottom: 8px; display: block; }
-        .dash-btn:active { transform: scale(0.9); background: var(--cyan); color: var(--deep); }
+        .nexa-btn i { font-size: 1.5rem; display: block; margin-bottom: 8px; }
+        .nexa-btn:active { transform: scale(0.9); background: var(--cyan); color: var(--deep); }
+        .btn-check { border-color: var(--royal); color: var(--royal); }
 
-        /* --- المختبر الجنائي (Log) --- */
-        .forensic-log {
-            margin: 20px; background: rgba(255, 45, 85, 0.05); border: 1px solid rgba(255, 45, 85, 0.2);
-            border-radius: 20px; padding: 20px; display: none;
-        }
-        .log-item { display: flex; justify-content: space-between; font-size: 0.7rem; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        /* --- الشهادة السيادية (Modal) --- */
-        .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-filter: blur(25px);
-            display: none; justify-content: center; align-items: center; z-index: 10000; padding: 20px;
-        }
-        .cert-paper {
-            background: #010413; border: 3px double var(--cyan); border-radius: 30px;
-            padding: 25px; width: 100%; max-width: 400px; text-align: center; position: relative;
-        }
-        .qr-box { background: white; padding: 10px; width: 140px; height: 140px; margin: 15px auto; border-radius: 12px; }
-
-        /* ميثاق السيادة */
-        .charter-text {
-            text-align: right; background: rgba(255, 177, 0, 0.05); padding: 12px;
-            border-right: 3px solid var(--amber); border-radius: 8px; margin-top: 15px;
-            font-size: 0.55rem; line-height: 1.5; color: #d1d5db;
-        }
-
-        /* أرشيف الأصول */
-        .assets-list { padding: 0 20px; }
-        .asset-card { 
-            background: rgba(255,255,255,0.02); padding: 15px; border-radius: 15px; 
-            margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05);
+        /* --- سجل البلوكتشين المحلي --- */
+        .chain-container { padding: 0 20px; }
+        .chain-item {
+            background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px;
+            margin-bottom: 10px; border-right: 4px solid var(--royal);
             display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* --- نافذة الشهادة السيادية (Modal) --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            display: none; justify-content: center; align-items: center; z-index: 10000;
+        }
+        #nexaCertificate {
+            background: #010413; border: 3px solid var(--cyan); padding: 30px;
+            width: 380px; border-radius: 25px; text-align: center; position: relative;
+        }
+        .qr-frame { background: white; padding: 10px; width: 140px; height: 140px; margin: 15px auto; border-radius: 12px; }
+        .sovereignty-charter {
+            background: rgba(255,177,0,0.05); border-right: 3px solid var(--amber);
+            padding: 12px; font-size: 0.55rem; text-align: right; line-height: 1.4; margin-top: 15px;
+        }
+
+        /* تصميم التحميل */
+        .download-trigger {
+            margin-top: 20px; background: var(--green); color: var(--deep);
+            border: none; padding: 15px; border-radius: 30px; width: 100%;
+            font-weight: 900; cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <div class="nexa-header">
-        <h1>NEXA GLOBAL</h1>
-        <p style="font-size: 0.6rem; color: var(--green); font-family: Orbitron; letter-spacing: 2px;">UNIVERSAL SOVEREIGNTY PROTOCOL</p>
+    <div class="nexa-bar">
+        <span><i class="fas fa-link"></i> NEXA LOCAL-CHAIN</span>
+        <span style="color:var(--green)">SECURE NODE: ACTIVE</span>
     </div>
 
     <div class="radar-zone">
-        <div id="radar" class="radar-scanner">
-            <div class="scan-line"></div>
+        <div id="radarDisc" class="radar-disc">
+            <div id="scanLine" class="scan-line"></div>
             <i id="radarIcon" class="fas fa-atom fa-5x" style="color: var(--cyan);"></i>
         </div>
-        <h2 id="radarTitle" style="margin-top:20px; font-weight: 900; font-size: 1rem;">بانتظار تحليل الأصول...</h2>
-        
-        <div id="forensicLog" class="forensic-log">
-            <h4 style="color:var(--red); font-size:0.8rem; margin-bottom:10px;"><i class="fas fa-biohazard"></i> تقرير التلاعب الجنائي المكتشف</h4>
-            <div class="log-item"><span>نوع التلاعب:</span> <span style="color:var(--amber)">تزييف بكسلي / تردد صوتي AI</span></div>
-            <div class="log-item"><span>المصدر:</span> <span style="color:var(--amber)">خوارزمية استغلال خارجية</span></div>
-            <div class="log-item"><span>حماية الصوت:</span> <span style="color:var(--green)">درع الترددات نشط</span></div>
-            <div class="log-item"><span>القرار التقني:</span> <span style="color:var(--red)">عزل المحتوى فوراً</span></div>
+        <h2 id="radarStatus" style="margin-top:25px; font-size: 1rem;">بانتظار تحليل البصمة الجزيئية...</h2>
+    </div>
+
+    <div class="action-hub">
+        <div class="nexa-btn" onclick="document.getElementById('sealInp').click()">
+            <i class="fas fa-fingerprint"></i> ختم سيادي
+        </div>
+        <div class="nexa-btn btn-check" onclick="document.getElementById('auditInp').click()">
+            <i class="fas fa-shield-search"></i> تدقيق جنائي
         </div>
     </div>
 
-    <div class="dashboard">
-        <div class="dash-btn" onclick="document.getElementById('sealInput').click()">
-            <i class="fas fa-fingerprint"></i><span>ختم جزيئي</span>
-        </div>
-        <div class="dash-btn" onclick="document.getElementById('auditInput').click()">
-            <i class="fas fa-vial-circle-check"></i><span>تدقيق جنائي</span>
-        </div>
+    <input type="file" id="sealInp" hidden onchange="nexaEngine(this, 'seal')">
+    <input type="file" id="auditInp" hidden onchange="nexaEngine(this, 'audit')">
+
+    <div class="chain-container">
+        <h3 style="font-size: 0.8rem; color: var(--royal); margin-bottom: 15px;">
+            <i class="fas fa-database"></i> السجل السيادي (Local Ledger)
+        </h3>
+        <div id="chainLog"></div>
     </div>
 
-    <input type="file" id="sealInput" hidden onchange="nexaSeal(this)">
-    <input type="file" id="auditInput" hidden onchange="nexaAudit(this)">
-
-    <div class="assets-list">
-        <h3 style="font-size: 0.8rem; margin-bottom: 15px; color: var(--cyan); font-family: Orbitron;">SOVEREIGN ARCHIVE</h3>
-        <div id="archiveBody"></div>
-    </div>
-
-    <div id="certModal" class="modal" onclick="this.style.display='none'">
-        <div class="cert-paper" onclick="event.stopPropagation()">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--cyan); padding-bottom:10px;">
-                <span style="font-family:Orbitron; font-size:0.5rem; color:var(--cyan);">NEXA.SEAL OFFICIAL VERIFICATION</span>
-                <i class="fas fa-certificate" style="color:var(--green);"></i>
+    <div id="modalOverlay" class="modal-overlay" onclick="this.style.display='none'">
+        <div style="text-align: center;">
+            <div id="nexaCertificate">
+                <h2 style="font-family: 'Orbitron'; color: var(--cyan); border-bottom: 1px solid var(--cyan); padding-bottom: 10px;">NEXA CERTIFICATE</h2>
+                <div id="qrPlaceholder" class="qr-frame"></div>
+                <h4 id="certFileName" style="margin-bottom: 5px; color: white;"></h4>
+                <p id="certHashID" style="font-size: 0.45rem; color: var(--green); font-family: 'Orbitron'; word-break: break-all;"></p>
+                
+                <div class="sovereignty-charter">
+                    <b>ميثاق السيادة الرقمية:</b><br>
+                    هذا المحتوى محمي ببروتوكول NEXA.SEAL وبصمة ترددية سيادية. يُحظر على خوارزميات الطرف الثالث (Meta, Google) استغلاله أو تعديله. الختم الجزيئي يثبت الملكية الأصلية ويُبطل أي ادعاء خارجي.
+                </div>
+                <p style="margin-top:15px; font-size:0.5rem; color:var(--cyan); font-family:'Orbitron';">AUTHENTICATED BY NEXA GLOBAL CORE</p>
             </div>
-
-            <h2 style="font-family:Orbitron; color:var(--cyan); margin-top:15px; font-size:1.2rem;">شهادة السيادة الرقمية</h2>
             
-            <div id="qrcode" class="qr-box"></div>
-            
-            <div style="margin: 10px 0;">
-                <p id="certFileName" style="font-weight:900; font-size:0.8rem;"></p>
-                <p id="certHash" style="font-size:0.4rem; color:var(--green); font-family:Orbitron;"></p>
-            </div>
-
-            <div class="charter-text">
-                <b><i class="fas fa-gavel"></i> ميثاق NEXA القانوني:</b><br>
-                هذا الملف محمي بختم جزيئي وبصمة صوتية سيادية. يُمنع استخدامه لتدريب الذكاء الاصطناعي أو التعديل عليه من قبل أي منصة عالمية (Meta, Google, etc). أي كسر للختم يُلغي شرعية الاستخدام ويُفعل بروتوكول التتبع الجنائي.
-            </div>
-
-            <button class="dash-btn" style="width:100%; margin-top:15px; padding:10px; border-radius:30px;" onclick="window.print()">
-                <i class="fas fa-file-pdf"></i> استخراج الوثيقة السيادية
+            <button class="download-trigger" onclick="captureAndDownload()">
+                <i class="fas fa-download"></i> تحميل الشهادة كصورة احترافية
             </button>
         </div>
     </div>
 
 <script>
-    let nexaCoreDB = new Map();
+    // --- المحرك المركزي لـ NEXA ---
+    const NexaStorage = {
+        saveSeal: (name, hash) => {
+            let chain = JSON.parse(localStorage.getItem('nexa_blockchain') || '[]');
+            if(!chain.find(f => f.hash === hash)) {
+                chain.push({name, hash, timestamp: new Date().toLocaleString()});
+                localStorage.setItem('nexa_blockchain', JSON.stringify(chain));
+            }
+        },
+        verify: (hash) => {
+            let chain = JSON.parse(localStorage.getItem('nexa_blockchain') || '[]');
+            return chain.find(f => f.hash === hash);
+        },
+        getChain: () => JSON.parse(localStorage.getItem('nexa_blockchain') || '[]')
+    };
 
-    async function nexaSeal(input) {
+    function refreshChainUI() {
+        const log = document.getElementById('chainLog');
+        const data = NexaStorage.getChain();
+        log.innerHTML = data.map(item => `
+            <div class="chain-item">
+                <div>
+                    <b style="font-size:0.8rem;">${item.name}.NEXA</b><br>
+                    <small style="color:var(--cyan); font-size:0.5rem;">${item.hash.substring(0,30)}...</small>
+                </div>
+                <i class="fas fa-certificate" style="color:var(--green)"></i>
+            </div>
+        `).join('');
+    }
+
+    // تشغيل السجل عند البداية
+    window.onload = refreshChainUI;
+
+    async function nexaEngine(input, mode) {
         const file = input.files[0];
         if(!file) return;
 
         const reader = new FileReader();
         reader.onload = async (e) => {
-            // توليد الهاش الجزيئي (البصمة الرقمية)
             const hash = CryptoJS.SHA256(e.target.result).toString();
-            nexaCoreDB.set(file.name, hash);
+            const radar = document.getElementById('radarDisc');
+            const status = document.getElementById('radarStatus');
+            const icon = document.getElementById('radarIcon');
 
-            // إضافة للأرشيف
-            const card = document.createElement('div');
-            card.className = 'asset-card';
-            card.innerHTML = `
-                <div>
-                    <div style="font-size:0.75rem; font-weight:900;">${file.name}.NEXA</div>
-                    <div style="font-size:0.45rem; color:var(--cyan); font-family:Orbitron;">SIG: ${hash.substring(0,16).toUpperCase()}</div>
-                </div>
-                <button onclick="generateKey('${file.name}', '${hash}')" style="background:var(--cyan); border:none; padding:6px 12px; border-radius:10px; font-size:0.6rem; font-weight:900; color:var(--deep);">المفتاح</button>
-            `;
-            document.getElementById('archiveBody').prepend(card);
-            alert("تم حقن الختم الجزيئي وبصمة الصوت السيادية.");
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    function nexaAudit(input) {
-        const file = input.files[0];
-        if(!file) return;
-
-        const radar = document.getElementById('radar');
-        const icon = document.getElementById('radarIcon');
-        const title = document.getElementById('radarTitle');
-        const log = document.getElementById('forensicLog');
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const currentHash = CryptoJS.SHA256(e.target.result).toString();
-            const originalHash = nexaCoreDB.get(file.name);
-
-            if (originalHash && originalHash === currentHash) {
-                // حالة التطابق (آمن)
-                radar.className = "radar-scanner status-safe";
-                icon.className = "fas fa-shield-check fa-5x";
-                icon.style.color = "var(--green)";
-                title.innerText = "أصل سيادي مطابق بنسبة 100%";
-                title.style.color = "var(--green)";
-                log.style.display = "none";
+            if(mode === 'seal') {
+                NexaStorage.saveSeal(file.name, hash);
+                refreshChainUI();
+                renderCertificate(file.name, hash);
             } else {
-                // حالة التلاعب (جنائي)
-                radar.className = "radar-scanner status-danger";
-                icon.className = "fas fa-biohazard fa-5x";
-                icon.style.color = "var(--red)";
-                title.innerText = "تنبيه: كشف تلاعب بالبصمة الجزيئية!";
-                title.style.color = "var(--red)";
-                log.style.display = "block";
+                const record = NexaStorage.verify(hash);
+                if(record) {
+                    radar.className = "radar-disc status-verified";
+                    icon.className = "fas fa-shield-check fa-5x";
+                    icon.style.color = "var(--royal)";
+                    status.innerHTML = `<span style="color:var(--royal)">أصل سيادي مطابق!</span><br><small>تاريخ الختم: ${record.timestamp}</small>`;
+                } else {
+                    radar.className = "radar-disc status-alert";
+                    icon.className = "fas fa-biohazard fa-5x";
+                    icon.style.color = "var(--red)";
+                    status.innerHTML = `<span style="color:var(--red)">تنبيه: ملف غير مسجل أو متلاعب به!</span>`;
+                }
             }
         };
         reader.readAsArrayBuffer(file);
     }
 
-    function generateKey(name, hash) {
+    function renderCertificate(name, hash) {
         document.getElementById('certFileName').innerText = name + ".NEXA";
-        document.getElementById('certHash').innerText = "MOLECULAR-HASH: " + hash;
+        document.getElementById('certHashID').innerText = "HASH: " + hash.toUpperCase();
         
-        // توليد الـ QR المرتبط بالسيادة
-        document.getElementById('qrcode').innerHTML = "";
-        new QRCode(document.getElementById("qrcode"), {
-            text: "NEXA-VERIFY-" + hash,
-            width: 120,
-            height: 120,
-            colorDark : "#010413",
-            colorLight : "#ffffff"
+        // توليد QR
+        document.getElementById('qrPlaceholder').innerHTML = "";
+        new QRCode(document.getElementById("qrPlaceholder"), {
+            text: "NEXA-AUTH-" + hash,
+            width: 140,
+            height: 140
         });
 
-        document.getElementById('certModal').style.display = 'flex';
+        document.getElementById('modalOverlay').style.display = 'flex';
+    }
+
+    function captureAndDownload() {
+        const cert = document.getElementById('nexaCertificate');
+        html2canvas(cert, { backgroundColor: '#010413', scale: 2 }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `NEXA_SOVEREIGN_CERT_${Date.now()}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        });
     }
 </script>
 </body>
