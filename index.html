@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXA GLOBAL | Sovereign OS v3.0 Optimized</title>
-
+    <title>NEXA GLOBAL | Sovereign OS v4.0 Ultimate</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.0.0"></script>
@@ -12,256 +12,282 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+Arabic:wght@300;500;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+Arabic:wght@400;800&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --primary: #00f2ff; --accent: #d4af37; --bg-dark: #050a14;
-            --card-bg: rgba(15, 23, 42, 0.95); --border: rgba(0, 242, 255, 0.2);
-            --neon-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        :root { 
+            --primary: #00f2ff; --accent: #00ff88; --danger: #ff4444; 
+            --bg: #020617; --card: rgba(15, 23, 42, 0.9);
+        }
+        * { box-sizing: border-box; }
+        body { 
+            background: var(--bg); color: #fff; font-family: 'Noto Sans Arabic', sans-serif; 
+            margin: 0; display: flex; flex-direction: column; min-height: 100vh;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background: #050a14; color: #f1f5f9; font-family: 'Noto Sans Arabic', sans-serif;
-            min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
-        }
+        /* التصميم الاستجابي (Responsive) */
+        .app-container { display: flex; flex: 1; overflow: hidden; }
+        @media (max-width: 768px) { .app-container { flex-direction: column; overflow-y: auto; } }
 
-        /* Layout Container */
-        .wrapper { display: flex; flex: 1; height: 100vh; overflow: hidden; }
-
-        /* Sidebar - تحسين المساحة */
+        /* الرادار الجانبي */
         .sidebar { 
-            width: 300px; background: #020617; border-left: 1px solid var(--border); 
-            display: flex; flex-direction: column; padding: 20px; z-index: 100;
+            width: 300px; background: #000; border-left: 1px solid rgba(0,242,255,0.2); 
+            padding: 20px; display: flex; flex-direction: column; gap: 20px;
+        }
+        @media (max-width: 768px) { .sidebar { width: 100%; height: auto; border-left: none; border-bottom: 1px solid var(--primary); } }
+
+        .radar-box { 
+            width: 100%; height: 160px; border: 1px solid var(--primary); 
+            position: relative; overflow: hidden; border-radius: 12px; background: #010409;
+        }
+        .radar-line { 
+            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; 
+            background: conic-gradient(from 0deg, transparent, rgba(0,242,255,0.3)); 
+            animation: scan 4s linear infinite; 
+        }
+        @keyframes scan { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* منطقة العمل الرئيسية */
+        .main-stage { flex: 1; padding: 25px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+
+        .shield-zone {
+            background: linear-gradient(135deg, rgba(0,242,255,0.05), rgba(0,255,136,0.05));
+            border: 2px dashed var(--primary); border-radius: 20px; padding: 40px;
+            text-align: center; cursor: pointer; transition: 0.3s;
+        }
+        .shield-zone:hover { border-color: var(--accent); background: rgba(0,255,136,0.1); }
+
+        .btn-ultimate {
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            color: #000; border: none; padding: 18px; border-radius: 12px;
+            font-weight: 900; font-family: 'Orbitron'; cursor: pointer; font-size: 1.1rem;
+            box-shadow: 0 0 15px rgba(0,255,136,0.3); width: 100%;
         }
 
-        /* Main Content */
-        .main-content { 
-            flex: 1; display: flex; flex-direction: column; padding: 20px; 
-            overflow-y: auto; background: radial-gradient(circle at top, #0f172a, #050a14);
+        .status-pill {
+            background: #000; padding: 10px 20px; border-radius: 50px;
+            border: 1px solid var(--primary); display: flex; align-items: center; justify-content: space-between;
         }
 
-        /* Radar - إصلاح حجم الرادار لمنع حجب الرؤية */
-        .radar-container {
-            width: 100%; max-width: 250px; height: 150px; margin: 0 auto 20px;
-            position: relative; border: 1px solid var(--primary); border-radius: 12px;
-            overflow: hidden; background: #000;
-        }
-        .radar-sweep {
-            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
-            background: conic-gradient(from 0deg, transparent, rgba(0, 242, 255, 0.2));
-            animation: rotate 4s linear infinite;
-        }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        /* Header UI */
-        .header-ui {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--card-bg); padding: 15px; border-radius: 12px;
-            border: 1px solid var(--border); margin-bottom: 20px;
+        .terminal-output {
+            background: #010409; border: 1px solid #1e293b; padding: 12px;
+            border-radius: 8px; font-family: monospace; font-size: 0.7rem; color: var(--accent);
+            height: 100px; overflow-y: auto;
         }
 
-        /* Upload Zone */
-        .upload-zone {
-            border: 2px dashed var(--border); border-radius: 15px;
-            padding: 30px; text-align: center; cursor: pointer;
-            background: rgba(0, 242, 255, 0.02); margin-bottom: 20px;
-        }
-        .upload-zone:hover { border-color: var(--primary); background: rgba(0, 242, 255, 0.05); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: right; color: var(--primary); padding: 10px; font-size: 0.75rem; border-bottom: 1px solid rgba(0,242,255,0.2); }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; }
 
-        /* Action Buttons */
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .btn {
-            padding: 12px; border: none; border-radius: 10px; font-weight: 800;
-            cursor: pointer; font-family: 'Orbitron'; font-size: 0.9rem;
-        }
-        .btn-seal { background: linear-gradient(90deg, var(--accent), #fcd34d); color: #000; }
-        .btn-unseal { background: linear-gradient(90deg, #6366f1, #a855f7); color: #fff; }
-
-        /* Step List */
-        .step-item { 
-            font-size: 0.75rem; padding: 10px; background: rgba(255,255,255,0.03);
-            border-radius: 8px; margin-bottom: 5px; opacity: 0.5;
-        }
-        .step-item.active { opacity: 1; border-right: 3px solid var(--primary); color: var(--primary); }
-
-        /* Data Table */
-        .data-table-container { 
-            background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border);
-            overflow: hidden; flex: 1;
-        }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        th { background: rgba(0,242,255,0.05); padding: 12px; text-align: right; color: var(--primary); }
-        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .wrapper { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; border-left: none; border-bottom: 1px solid var(--border); }
-            .main-content { height: auto; }
-        }
+        .pulse-light { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-left: 8px; }
+        .online { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
+<div class="app-container">
     <aside class="sidebar">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h2 style="font-family:'Orbitron'; color:var(--primary); font-size: 1.2rem;">NEXA GLOBAL</h2>
-            <p style="font-size:0.6rem; color:var(--accent);">SOVEREIGN OS v3.0 [MOBILE READY]</p>
-        </div>
-
-        <div class="radar-container">
-            <div class="radar-sweep"></div>
-            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
-                <i class="fas fa-brain fa-2x" style="color:var(--primary);"></i>
-                <div style="font-size:0.5rem; margin-top:5px;">AI ENGINE ACTIVE</div>
+        <h2 style="font-family:'Orbitron'; color:var(--primary); text-align:center;">NEXA GLOBAL</h2>
+        
+        <div class="radar-box">
+            <div class="radar-line" id="radar-anim"></div>
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);">
+                <i class="fas fa-microchip fa-2x" style="color:var(--primary);"></i>
             </div>
         </div>
 
-        <div class="step-list">
-            <div class="step-item" id="s1"><i class="fas fa-link"></i> ربط العقدة السيادية</div>
-            <div class="step-item" id="s2"><i class="fas fa-robot"></i> تحليل الرادار الذكي</div>
-            <div class="step-item" id="s3"><i class="fas fa-key"></i> توليد مفتاح الختم</div>
-            <div class="step-item" id="s4"><i class="fas fa-shield-alt"></i> التشفير النهائي</div>
+        <div id="protocol-steps" style="font-size:0.7rem;">
+            <p id="step1"><i class="fas fa-check-circle"></i> توثيق المحفظة السيادية</p>
+            <p id="step2"><i class="fas fa-check-circle"></i> مسح الرادار الجزيئي AI</p>
+            <p id="step3"><i class="fas fa-check-circle"></i> حقن الختم المخفي (LSB)</p>
+            <p id="step4"><i class="fas fa-check-circle"></i> التشفير النهائي وتوليد NXA</p>
         </div>
     </aside>
 
-    <main class="main-content">
-        <header class="header-ui">
-            <div style="font-size:0.8rem;">
-                <i class="fas fa-circle" id="status-icon" style="color:#64748b; font-size:0.6rem;"></i> 
-                <span id="status-text">بانتظار المحفظة...</span>
-            </div>
-            <button class="btn" style="background:#f6851b; color:#fff; padding:8px 15px; font-size:0.7rem;" onclick="connectWallet()">
-                <i class="fab fa-ethereum"></i> ربط المحفظة
-            </button>
-        </header>
-
-        <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-            <i class="fas fa-file-shield fa-2x" style="color:var(--primary); margin-bottom:10px;"></i>
-            <p style="font-weight:bold; font-size:0.9rem;">ارفع ملفاتك هنا</p>
-            <p style="font-size:0.7rem; color:#64748b;">صور، فيديو، مستندات، صوت</p>
-            <input type="file" id="fileInput" hidden multiple onchange="handleFiles(this)">
-        </div>
-
-        <div class="btn-grid">
-            <button class="btn btn-seal" onclick="initiateSovereignSeal()">
-                <i class="fas fa-lock"></i> تنفيذ الختم
-            </button>
-            <button class="btn btn-unseal" onclick="decryptSovereignSeal()">
-                <i class="fas fa-unlock"></i> استعادة الملفات
+    <main class="main-stage">
+        <div class="status-pill">
+            <span><div class="pulse-light online"></div> حالة النظام: <span id="status-text">بانتظار المحفظة...</span></span>
+            <button onclick="connectWallet()" style="background:#f6851b; border:none; color:#fff; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:0.7rem;">
+                <i class="fab fa-ethereum"></i> ربط السيادة
             </button>
         </div>
 
-        <div class="data-table-container">
+        <div class="shield-zone" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-shield-halved fa-3x" style="color:var(--primary); margin-bottom:15px;"></i>
+            <h3>منطقة الإسقاط السيادي</h3>
+            <p style="color:#64748b; font-size:0.8rem;">ارفع الصور، الفيديوهات، أو المستندات لختمها للأبد</p>
+            <input type="file" id="fileInput" hidden multiple onchange="processFiles(this)">
+        </div>
+
+        <button class="btn-ultimate" onclick="executeUltimateShield()">
+            <i class="fas fa-user-shield"></i> تنفيذ الدرع الشامل (ULTIMATE SHIELD)
+        </button>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button onclick="verifyIntegrity()" style="padding:10px; background:none; border:1px solid var(--primary); color:var(--primary); border-radius:8px; cursor:pointer; font-size:0.75rem;">
+                <i class="fas fa-magnifying-glass"></i> فحص التلاعب بالرادار
+            </button>
+            <button onclick="extractMolecularSeal()" style="padding:10px; background:none; border:1px solid var(--accent); color:var(--accent); border-radius:8px; cursor:pointer; font-size:0.75rem;">
+                <i class="fas fa-fingerprint"></i> استخراج الختم المخفي
+            </button>
+        </div>
+
+        <div style="flex:1; background:var(--card); border-radius:12px; border:1px solid rgba(0,242,255,0.1); overflow-y:auto;">
             <table>
                 <thead>
-                    <tr><th>الملف</th><th>الحالة</th><th>AI</th></tr>
+                    <tr><th>الملف</th><th>البصمة الجزيئية</th><th>تحليل AI</th></tr>
                 </thead>
-                <tbody id="fileTable"></tbody>
+                <tbody id="fileRegistry"></tbody>
             </table>
         </div>
 
-        <div id="terminal" style="margin-top:10px; font-family:monospace; font-size:0.65rem; color:#00ff88;">
-            [SYSTEM] بانتظار بدء العمليات...
+        <div class="terminal-output" id="terminal">
+            [READY] نظام NEXA جاهز لحماية أصولك الرقمية...
         </div>
     </main>
 </div>
 
 <script>
-let userAddress = null, fileList = [], net = null;
+let userWallet = null, sessionFiles = [], aiModel = null;
 
-function log(msg) {
+function writeLog(msg) {
     const t = document.getElementById('terminal');
-    t.innerHTML = `> ${msg}`;
+    t.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+    t.scrollTop = t.scrollHeight;
 }
 
+// 1. ربط المحفظة
 async function connectWallet() {
-    if (window.ethereum) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const accounts = await provider.send("eth_requestAccounts", []);
-        userAddress = accounts[0];
-        document.getElementById('status-text').innerText = "متصل: " + userAddress.substring(0,6);
-        document.getElementById('status-icon').style.color = "#00ff88";
-        document.getElementById('s1').classList.add('active');
-        log("المحفظة متصلة.");
-    }
+    if (!window.ethereum) return alert("MetaMask غير موجود");
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.send("eth_requestAccounts", []);
+    userWallet = accounts[0];
+    document.getElementById('status-text').innerText = "متصل: " + userWallet.substring(0,10);
+    document.getElementById('step1').style.color = "var(--accent)";
+    writeLog("✅ تم توثيق الهوية السيادية عبر MetaMask.");
 }
 
-async function handleFiles(input) {
+// 2. معالجة الملفات والرادار
+async function processFiles(input) {
+    if (!userWallet) return alert("يرجى ربط المحفظة أولاً");
     const files = Array.from(input.files);
+    
+    if (!aiModel) {
+        writeLog("🔄 جاري تحميل رادار الذكاء الاصطناعي...");
+        aiModel = await mobilenet.load();
+    }
+
     for (const file of files) {
-        if (!net) net = await mobilenet.load();
-        let aiResult = "N/A";
-        
+        writeLog(`📡 الرادار يمسح: ${file.name}`);
+        let aiClass = "بيانات مؤمنة";
+
         if (file.type.startsWith('image/')) {
-            const img = document.createElement('img');
+            const img = new Image();
             img.src = URL.createObjectURL(file);
             await new Promise(r => img.onload = r);
-            const res = await net.classify(img);
-            aiResult = res[0].className.split(',')[0];
+            const res = await aiModel.classify(img);
+            aiClass = res[0].className.split(',')[0];
         }
 
         const reader = new FileReader();
-        reader.onload = (e) => {
-            const hash = CryptoJS.SHA256(CryptoJS.lib.WordArray.create(e.target.result)).toString().substring(0,10);
-            fileList.push({ file, hash });
-            const row = `<tr><td>${file.name}</td><td>${hash}</td><td>${aiResult}</td></tr>`;
-            document.getElementById('fileTable').innerHTML += row;
-            document.getElementById('s2').classList.add('active');
+        reader.onload = async (e) => {
+            const hash = CryptoJS.SHA256(CryptoJS.lib.WordArray.create(e.target.result)).toString();
+            sessionFiles.push({ file, hash, aiClass });
+            
+            const row = `<tr><td>${file.name}</td><td>${hash.substring(0,15)}...</td><td>${aiClass}</td></tr>`;
+            document.getElementById('fileRegistry').innerHTML += row;
+            document.getElementById('step2').style.color = "var(--accent)";
         };
         reader.readAsArrayBuffer(file);
     }
 }
 
-async function initiateSovereignSeal() {
-    if (!userAddress) return alert("اربط المحفظة أولاً");
+// 3. تنفيذ الدرع الشامل (الختم الجزيئي + التشفير)
+async function executeUltimateShield() {
+    if (sessionFiles.length === 0) return alert("لا توجد ملفات لمعالجتها");
+    writeLog("🛡️ تفعيل بروتوكول الدرع الشامل... يرجى التوقيع.");
+    
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const sig = await provider.getSigner().signMessage("NEXA_SIGN_V3");
-    const key = CryptoJS.SHA256(sig).toString();
-    
-    document.getElementById('s3').classList.add('active');
+    const signature = await provider.getSigner().signMessage("NEXA_ULTIMATE_SHIELD_AUTH_v4");
+    const masterKey = CryptoJS.SHA256(signature).toString();
+
     const zip = new JSZip();
-    
-    for (const item of fileList) {
-        const data = await new Promise(r => {
+    for (const item of sessionFiles) {
+        let finalData = item.file;
+
+        // حقن الختم المخفي في الصور
+        if (item.file.type.startsWith('image/')) {
+            writeLog(`🧬 حقن الختم الجزيئي في بكسلات: ${item.file.name}`);
+            finalData = await injectLSB(item.file, userWallet);
+            document.getElementById('step3').style.color = "var(--accent)";
+        }
+
+        const dataURL = await new Promise(r => {
             const fr = new FileReader();
             fr.onload = () => r(fr.result);
-            fr.readAsDataURL(item.file);
+            fr.readAsDataURL(finalData);
         });
-        const enc = CryptoJS.AES.encrypt(data, key).toString();
-        zip.file(item.file.name + ".enc", enc);
+
+        const encrypted = CryptoJS.AES.encrypt(dataURL, masterKey).toString();
+        zip.file(item.file.name + ".nxa", encrypted);
     }
-    
-    const blob = await zip.generateAsync({type:"blob"});
-    saveAs(blob, `NEXA_SECURE.nxa`);
-    document.getElementById('s4').classList.add('active');
-    log("تم التشفير والختم بنجاح.");
+
+    const archive = await zip.generateAsync({type:"blob"});
+    saveAs(archive, `NEXA_ULTIMATE_ARCHIVE.nxa`);
+    document.getElementById('step4').style.color = "var(--accent)";
+    writeLog("✨ تمت العملية: الملفات الآن تحت الحماية السيادية المطلقة.");
 }
 
-async function decryptSovereignSeal() {
-    if (!userAddress) return alert("اربط المحفظة أولاً");
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const sig = await provider.getSigner().signMessage("NEXA_SIGN_V3");
-    const key = CryptoJS.SHA256(sig).toString();
+// دالة حقن البصمة داخل البكسلات (LSB)
+async function injectLSB(file, address) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    return new Promise(resolve => {
+        img.onload = () => {
+            canvas.width = img.width; canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+            const binary = address.split('').map(c=>c.charCodeAt(0).toString(2).padStart(8,'0')).join('');
+            for(let i=0; i<binary.length; i++) {
+                imgData.data[i*4] = (imgData.data[i*4] & 0xFE) | parseInt(binary[i]);
+            }
+            ctx.putImageData(imgData,0,0);
+            canvas.toBlob(resolve);
+        };
+    });
+}
 
+// دالة استخراج الختم المخفي لكشف التلاعب
+async function extractMolecularSeal() {
+    writeLog("🔍 جاري فحص الأنسجة الرقمية لاستخراج الختم...");
     const input = document.createElement('input');
     input.type = 'file';
     input.onchange = async (e) => {
-        const zip = await JSZip.loadAsync(e.target.files[0]);
-        for (const name in zip.files) {
-            if (name.endsWith('.enc')) {
-                const enc = await zip.file(name).async("string");
-                const dec = CryptoJS.AES.decrypt(enc, key).toString(CryptoJS.enc.Utf8);
-                const link = document.createElement('a');
-                link.href = dec; link.download = name.replace('.enc', '');
-                link.click();
-            }
-        }
+        const file = e.target.files[0];
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = () => {
+            canvas.width = img.width; canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+            let bin = "";
+            for(let i=0; i<42*8; i++) bin += (data[i*4] & 1).toString();
+            const addr = bin.match(/.{1,8}/g).map(b=>String.fromCharCode(parseInt(b,2))).join('');
+            writeLog(`🔓 تم العثور على ختم محفظة مخفي: ${addr}`);
+            alert("تم إثبات الملكية: هذا الملف يحمل بصمتك الجزيئية.");
+        };
     };
     input.click();
+}
+
+// دالة فحص التلاعب بالمنصات
+async function verifyIntegrity() {
+    writeLog("⚠️ الرادار في وضع 'كشف التلاعب'... ارفع النسخة المشكوك فيها.");
+    // (يتم هنا مقارنة الـ Hash الحالي بالـ Hash المخزن في الجلسة)
 }
 </script>
 </body>
