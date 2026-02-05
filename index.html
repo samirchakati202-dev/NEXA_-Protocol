@@ -3,317 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXA GLOBAL | Sovereign OS Full Suite v3.0</title>
-    
+    <title>NEXA GLOBAL | Sovereign OS v3.0 Optimized</title>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+Arabic:wght@300;500;800&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
-            --primary: #00f2ff;
-            --accent: #d4af37;
-            --bg-dark: #050a14;
-            --card-bg: rgba(15, 23, 42, 0.9);
-            --border: rgba(0, 242, 255, 0.25);
-            --neon-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            --primary: #00f2ff; --accent: #d4af37; --bg-dark: #050a14;
+            --card-bg: rgba(15, 23, 42, 0.95); --border: rgba(0, 242, 255, 0.2);
+            --neon-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; transition: all 0.3s ease; }
-
-        body { 
-            background: radial-gradient(circle at center, #0f172a 0%, #050a14 100%);
-            color: #f1f5f9;
-            font-family: 'Noto Sans Arabic', sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #050a14; color: #f1f5f9; font-family: 'Noto Sans Arabic', sans-serif;
+            min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
         }
 
-        /*Sidebar*/
-        .sidebar {
-            width: 350px;
-            background: rgba(2, 6, 23, 0.95);
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 25px;
-            backdrop-filter: blur(15px);
-            z-index: 100;
+        /* Layout Container */
+        .wrapper { display: flex; flex: 1; height: 100vh; overflow: hidden; }
+
+        /* Sidebar - تحسين المساحة */
+        .sidebar { 
+            width: 300px; background: #020617; border-left: 1px solid var(--border); 
+            display: flex; flex-direction: column; padding: 20px; z-index: 100;
         }
 
-        .brand-header h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            color: var(--primary);
-            text-shadow: var(--neon-shadow);
-            text-align: center;
+        /* Main Content */
+        .main-content { 
+            flex: 1; display: flex; flex-direction: column; padding: 20px; 
+            overflow-y: auto; background: radial-gradient(circle at top, #0f172a, #050a14);
         }
 
-        /*Radar*/
-        .radar-box {
-            position: relative;
-            width: 100%; height: 180px;
-            background: #000;
-            border-radius: 20px;
-            border: 1px solid var(--primary);
-            overflow: hidden;
-            margin: 20px 0;
+        /* Radar - إصلاح حجم الرادار لمنع حجب الرؤية */
+        .radar-container {
+            width: 100%; max-width: 250px; height: 150px; margin: 0 auto 20px;
+            position: relative; border: 1px solid var(--primary); border-radius: 12px;
+            overflow: hidden; background: #000;
         }
         .radar-sweep {
-            position: absolute;
-            width: 200%; height: 200%;
-            top: -50%; left: -50%;
-            background: conic-gradient(from 0deg, transparent, rgba(0, 242, 255, 0.3));
+            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+            background: conic-gradient(from 0deg, transparent, rgba(0, 242, 255, 0.2));
             animation: rotate 4s linear infinite;
         }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /*Steps*/
-        .step-item {
-            background: var(--card-bg);
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            opacity: 0.5;
-        }
-        .step-item.active { opacity: 1; border-right: 3px solid var(--primary); box-shadow: var(--neon-shadow); }
-
-        /*Main*/
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        /* Header UI */
+        .header-ui {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--card-bg); padding: 15px; border-radius: 12px;
+            border: 1px solid var(--border); margin-bottom: 20px;
         }
 
-        .action-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            padding: 15px 25px;
-            border-radius: 15px;
-            border: 1px solid var(--border);
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed var(--border); border-radius: 15px;
+            padding: 30px; text-align: center; cursor: pointer;
+            background: rgba(0, 242, 255, 0.02); margin-bottom: 20px;
         }
+        .upload-zone:hover { border-color: var(--primary); background: rgba(0, 242, 255, 0.05); }
 
-        .wallet-connector {
-            background: linear-gradient(135deg, #f6851b, #e2761b);
-            border: none; padding: 10px 20px; border-radius: 10px;
-            color: #fff; font-weight: 800; cursor: pointer;
+        /* Action Buttons */
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .btn {
+            padding: 12px; border: none; border-radius: 10px; font-weight: 800;
+            cursor: pointer; font-family: 'Orbitron'; font-size: 0.9rem;
         }
+        .btn-seal { background: linear-gradient(90deg, var(--accent), #fcd34d); color: #000; }
+        .btn-unseal { background: linear-gradient(90deg, #6366f1, #a855f7); color: #fff; }
 
-        /*Upload & Progress*/
-        .vault-upload {
-            height: 200px;
-            border: 2px dashed var(--primary);
-            background: rgba(0, 242, 255, 0.02);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
+        /* Step List */
+        .step-item { 
+            font-size: 0.75rem; padding: 10px; background: rgba(255,255,255,0.03);
+            border-radius: 8px; margin-bottom: 5px; opacity: 0.5;
         }
-        .progress-wrapper { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; display: none; }
-        #progress-bar { width: 0%; height: 100%; background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+        .step-item.active { opacity: 1; border-right: 3px solid var(--primary); color: var(--primary); }
 
-        /*Cloud Vault Table*/
-        .cloud-vault {
-            background: var(--card-bg);
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            padding: 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+        /* Data Table */
+        .data-table-container { 
+            background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border);
+            overflow: hidden; flex: 1;
         }
-        .vault-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .vault-table th { color: var(--accent); text-align: right; font-size: 0.8rem; padding: 10px; border-bottom: 1px solid var(--border); }
-        .vault-table td { padding: 12px 10px; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .action-icon { cursor: pointer; color: var(--primary); }
-        .action-icon:hover { color: #fff; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        th { background: rgba(0,242,255,0.05); padding: 12px; text-align: right; color: var(--primary); }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        .btn-execute {
-            background: linear-gradient(90deg, var(--accent), #fcd34d);
-            color: #050a14; padding: 18px; border-radius: 12px;
-            border: none; font-family: 'Orbitron', sans-serif;
-            font-weight: 900; font-size: 1.1rem; cursor: pointer;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .wrapper { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; border-left: none; border-bottom: 1px solid var(--border); }
+            .main-content { height: auto; }
         }
-
-        .terminal-box { height: 100px; background: #000; border-radius: 10px; padding: 10px; font-family: monospace; font-size: 0.75rem; color: #00ff88; overflow-y: auto; }
     </style>
 </head>
 <body>
 
+<div class="wrapper">
     <aside class="sidebar">
-        <div class="brand-header">
-            <h1>NEXA GLOBAL</h1>
-            <p style="color: #64748b; font-size: 0.7rem; font-weight: 800; text-align:center;">SOVEREIGN OS v3.0</p>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="font-family:'Orbitron'; color:var(--primary); font-size: 1.2rem;">NEXA GLOBAL</h2>
+            <p style="font-size:0.6rem; color:var(--accent);">SOVEREIGN OS v3.0 [MOBILE READY]</p>
         </div>
-        <div class="radar-box"><div class="radar-sweep"></div></div>
+
+        <div class="radar-container">
+            <div class="radar-sweep"></div>
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
+                <i class="fas fa-brain fa-2x" style="color:var(--primary);"></i>
+                <div style="font-size:0.5rem; margin-top:5px;">AI ENGINE ACTIVE</div>
+            </div>
+        </div>
+
         <div class="step-list">
-            <div class="step-item" id="s1"><i class="fas fa-fingerprint"></i> التحقق الحيوي</div>
-            <div class="step-item" id="s2"><i class="fas fa-key"></i> تشفير المفاتيح</div>
-            <div class="step-item" id="s3"><i class="fas fa-link"></i> ربط الـ Web3</div>
-            <div class="step-item" id="s4"><i class="fas fa-file-shield"></i> الختم السيادي</div>
+            <div class="step-item" id="s1"><i class="fas fa-link"></i> ربط العقدة السيادية</div>
+            <div class="step-item" id="s2"><i class="fas fa-robot"></i> تحليل الرادار الذكي</div>
+            <div class="step-item" id="s3"><i class="fas fa-key"></i> توليد مفتاح الختم</div>
+            <div class="step-item" id="s4"><i class="fas fa-shield-alt"></i> التشفير النهائي</div>
         </div>
-        <div class="terminal-box" id="terminal"> [READY] بانتظار الملف... </div>
     </aside>
 
     <main class="main-content">
-        <div class="action-header">
-            <div><i class="fas fa-network-wired" style="color: var(--primary);"></i> النظام نشط</div>
-            <button class="wallet-connector" id="walletBtn" onclick="connectWallet()">ربط المحفظة</button>
-        </div>
-
-        <div class="vault-upload" onclick="document.getElementById('fileInput').click()">
-            <i class="fas fa-upload fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
-            <h3 id="fileNameDisplay">اختر الملف المراد حمايته</h3>
-            <input type="file" id="fileInput" hidden onchange="handleFile(this)">
-        </div>
-
-        <div class="progress-wrapper" id="pWrapper"><div id="progress-bar"></div></div>
-
-        <button class="btn-execute" id="execBtn" onclick="initiateSovereignSeal()">تنفيذ الختم وتوليد الشهادة</button>
-
-        <section class="cloud-vault">
-            <h3 style="font-family: 'Orbitron'; color: var(--primary); font-size: 1rem;"><i class="fas fa-database"></i> الأرشيف السحابي (NEXA VAULT)</h3>
-            <div style="overflow-y: auto;">
-                <table class="vault-table">
-                    <thead>
-                        <tr>
-                            <th>اسم الملف</th>
-                            <th>التوقيع</th>
-                            <th>التاريخ</th>
-                            <th>إجراء</th>
-                        </tr>
-                    </thead>
-                    <tbody id="vaultBody">
-                        </tbody>
-                </table>
+        <header class="header-ui">
+            <div style="font-size:0.8rem;">
+                <i class="fas fa-circle" id="status-icon" style="color:#64748b; font-size:0.6rem;"></i> 
+                <span id="status-text">بانتظار المحفظة...</span>
             </div>
-        </section>
+            <button class="btn" style="background:#f6851b; color:#fff; padding:8px 15px; font-size:0.7rem;" onclick="connectWallet()">
+                <i class="fab fa-ethereum"></i> ربط المحفظة
+            </button>
+        </header>
+
+        <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-file-shield fa-2x" style="color:var(--primary); margin-bottom:10px;"></i>
+            <p style="font-weight:bold; font-size:0.9rem;">ارفع ملفاتك هنا</p>
+            <p style="font-size:0.7rem; color:#64748b;">صور، فيديو، مستندات، صوت</p>
+            <input type="file" id="fileInput" hidden multiple onchange="handleFiles(this)">
+        </div>
+
+        <div class="btn-grid">
+            <button class="btn btn-seal" onclick="initiateSovereignSeal()">
+                <i class="fas fa-lock"></i> تنفيذ الختم
+            </button>
+            <button class="btn btn-unseal" onclick="decryptSovereignSeal()">
+                <i class="fas fa-unlock"></i> استعادة الملفات
+            </button>
+        </div>
+
+        <div class="data-table-container">
+            <table>
+                <thead>
+                    <tr><th>الملف</th><th>الحالة</th><th>AI</th></tr>
+                </thead>
+                <tbody id="fileTable"></tbody>
+            </table>
+        </div>
+
+        <div id="terminal" style="margin-top:10px; font-family:monospace; font-size:0.65rem; color:#00ff88;">
+            [SYSTEM] بانتظار بدء العمليات...
+        </div>
     </main>
+</div>
 
-    <script>
-        let userAddress = null;
-        let currentFileData = null;
+<script>
+let userAddress = null, fileList = [], net = null;
 
-        function log(msg) {
-            const t = document.getElementById('terminal');
-            t.innerHTML += `<div>> ${msg}</div>`;
-            t.scrollTop = t.scrollHeight;
+function log(msg) {
+    const t = document.getElementById('terminal');
+    t.innerHTML = `> ${msg}`;
+}
+
+async function connectWallet() {
+    if (window.ethereum) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const accounts = await provider.send("eth_requestAccounts", []);
+        userAddress = accounts[0];
+        document.getElementById('status-text').innerText = "متصل: " + userAddress.substring(0,6);
+        document.getElementById('status-icon').style.color = "#00ff88";
+        document.getElementById('s1').classList.add('active');
+        log("المحفظة متصلة.");
+    }
+}
+
+async function handleFiles(input) {
+    const files = Array.from(input.files);
+    for (const file of files) {
+        if (!net) net = await mobilenet.load();
+        let aiResult = "N/A";
+        
+        if (file.type.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            await new Promise(r => img.onload = r);
+            const res = await net.classify(img);
+            aiResult = res[0].className.split(',')[0];
         }
 
-        async function connectWallet() {
-            if (window.ethereum) {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const accounts = await provider.send("eth_requestAccounts", []);
-                userAddress = accounts[0];
-                document.getElementById('walletBtn').innerText = userAddress.substring(0,8) + "...";
-                document.getElementById('s3').classList.add('active');
-                log("تم الاتصال بالهوية الرقمية.");
-                loadVault();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const hash = CryptoJS.SHA256(CryptoJS.lib.WordArray.create(e.target.result)).toString().substring(0,10);
+            fileList.push({ file, hash });
+            const row = `<tr><td>${file.name}</td><td>${hash}</td><td>${aiResult}</td></tr>`;
+            document.getElementById('fileTable').innerHTML += row;
+            document.getElementById('s2').classList.add('active');
+        };
+        reader.readAsArrayBuffer(file);
+    }
+}
+
+async function initiateSovereignSeal() {
+    if (!userAddress) return alert("اربط المحفظة أولاً");
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const sig = await provider.getSigner().signMessage("NEXA_SIGN_V3");
+    const key = CryptoJS.SHA256(sig).toString();
+    
+    document.getElementById('s3').classList.add('active');
+    const zip = new JSZip();
+    
+    for (const item of fileList) {
+        const data = await new Promise(r => {
+            const fr = new FileReader();
+            fr.onload = () => r(fr.result);
+            fr.readAsDataURL(item.file);
+        });
+        const enc = CryptoJS.AES.encrypt(data, key).toString();
+        zip.file(item.file.name + ".enc", enc);
+    }
+    
+    const blob = await zip.generateAsync({type:"blob"});
+    saveAs(blob, `NEXA_SECURE.nxa`);
+    document.getElementById('s4').classList.add('active');
+    log("تم التشفير والختم بنجاح.");
+}
+
+async function decryptSovereignSeal() {
+    if (!userAddress) return alert("اربط المحفظة أولاً");
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const sig = await provider.getSigner().signMessage("NEXA_SIGN_V3");
+    const key = CryptoJS.SHA256(sig).toString();
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = async (e) => {
+        const zip = await JSZip.loadAsync(e.target.files[0]);
+        for (const name in zip.files) {
+            if (name.endsWith('.enc')) {
+                const enc = await zip.file(name).async("string");
+                const dec = CryptoJS.AES.decrypt(enc, key).toString(CryptoJS.enc.Utf8);
+                const link = document.createElement('a');
+                link.href = dec; link.download = name.replace('.enc', '');
+                link.click();
             }
         }
-
-        function handleFile(input) {
-            const file = input.files[0];
-            if (file) {
-                document.getElementById('fileNameDisplay').innerText = file.name;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const hash = CryptoJS.SHA256(CryptoJS.lib.WordArray.create(e.target.result)).toString();
-                    currentFileData = { name: file.name, hash: hash, date: new Date().toLocaleDateString() };
-                    log("بصمة الملف جاهزة: " + hash.substring(0,16));
-                };
-                reader.readAsArrayBuffer(file);
-            }
-        }
-
-        async function initiateSovereignSeal() {
-            if (!userAddress || !currentFileData) return alert("يرجى ربط المحفظة واختيار ملف!");
-            
-            const btn = document.getElementById('execBtn');
-            const pWrapper = document.getElementById('pWrapper');
-            const pBar = document.getElementById('progress-bar');
-            
-            try {
-                log("بانتظار توقيع المستخدم...");
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const signer = provider.getSigner();
-                const signature = await signer.signMessage(`NEXA_GENESIS_SEAL:${currentFileData.hash}`);
-                
-                btn.disabled = true;
-                pWrapper.style.display = 'block';
-                
-                for(let i=0; i<=100; i+=2) {
-                    pBar.style.width = i + "%";
-                    if(i==30) document.getElementById('s1').classList.add('active');
-                    if(i==60) document.getElementById('s2').classList.add('active');
-                    if(i==90) document.getElementById('s4').classList.add('active');
-                    await new Promise(r => setTimeout(r, 30));
-                }
-
-                saveToVault(currentFileData, signature);
-                generatePDF(currentFileData, signature);
-                
-                log("اكتمل الختم السيادي.");
-                btn.disabled = false;
-            } catch (e) { log("خطأ: " + e.message); btn.disabled = false; }
-        }
-
-        function saveToVault(fileData, sig) {
-            let vault = JSON.parse(localStorage.getItem('nexa_vault') || '[]');
-            vault.unshift({ ...fileData, signature: sig });
-            localStorage.setItem('nexa_vault', JSON.stringify(vault));
-            loadVault();
-        }
-
-        function loadVault() {
-            const vault = JSON.parse(localStorage.getItem('nexa_vault') || '[]');
-            const tbody = document.getElementById('vaultBody');
-            tbody.innerHTML = vault.map(item => `
-                <tr>
-                    <td>${item.name}</td>
-                    <td style="font-family:monospace; font-size:0.7rem;">${item.signature.substring(0,20)}...</td>
-                    <td>${item.date}</td>
-                    <td><i class="fas fa-file-pdf action-icon" onclick="reDownload('${item.hash}')"></i></td>
-                </tr>
-            `).join('');
-        }
-
-        function reDownload(hash) {
-            const vault = JSON.parse(localStorage.getItem('nexa_vault') || '[]');
-            const item = vault.find(i => i.hash === hash);
-            if(item) generatePDF(item, item.signature);
-        }
-
-        function generatePDF(data, sig) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'l' });
-            doc.setFillColor(5, 10, 20); doc.rect(0, 0, 297, 210, 'F');
-            doc.setTextColor(0, 242, 255); doc.setFontSize(25);
-            doc.text("NEXA GLOBAL SOVEREIGN CERTIFICATE", 148, 40, {align:'center'});
-            doc.setTextColor(255); doc.setFontSize(12);
-            doc.text(`File Name: ${data.name}`, 40, 70);
-            doc.text(`SHA-256 Hash: ${data.hash}`, 40, 85);
-            doc.text(`Entity: ${userAddress}`, 40, 100);
-            doc.setFontSize(8); doc.setTextColor(150);
-            doc.text(`Digital Signature: ${sig}`, 40, 130, {maxWidth: 220});
-            doc.save(`NEXA_SEAL_${data.name}.pdf`);
-        }
-
-        window.onload = loadVault;
-    </script>
+    };
+    input.click();
+}
+</script>
 </body>
 </html>
