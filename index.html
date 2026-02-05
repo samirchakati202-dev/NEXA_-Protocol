@@ -3,183 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXA OS v8.0 | Forensic Alert System</title>
+    <title>NEXA OS v8.5 | Ultimate Sovereign Shield</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+Arabic:wght@400;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --nexa-blue: #00f2ff; --nexa-green: #00ff88; --nexa-red: #ff0055;
-            --nexa-gold: #ffcc00; --bg: #010409;
+            --nexa-blue: #00d2ff; --nexa-green: #00ff88; --nexa-red: #ff0055;
+            --nexa-gold: #ffcc00; --bg-dark: #020617; --panel: rgba(15, 23, 42, 0.9);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            background: var(--bg); color: #fff; font-family: 'Noto Sans Arabic', sans-serif;
-            display: flex; height: 100vh; overflow: hidden;
+            background: var(--bg-dark); color: #fff; font-family: 'Noto Sans Arabic', sans-serif;
+            display: grid; grid-template-columns: 350px 1fr 350px; height: 100vh; overflow: hidden;
+            border: 5px solid #1e293b;
         }
 
-        /* --- الجناح الأخضر: الختم --- */
-        .wing-seal {
-            flex: 1; border-left: 1px solid rgba(0,255,136,0.2); 
-            display: flex; flex-direction: column; padding: 25px; gap: 20px;
+        /* --- الأجنحة الجانبية --- */
+        .wing { 
+            padding: 20px; display: flex; flex-direction: column; gap: 15px; 
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(10px);
+        }
+        
+        /* الجناح الأحمر (رادار التحقيق) */
+        .forensic-wing { border-left: 2px solid var(--nexa-red); }
+        /* الجناح الأخضر (الختم الجزيئي) */
+        .sealing-wing { border-right: 2px solid var(--nexa-green); }
+        
+        /* المركز (Quantum Hub) */
+        .central-hub { 
+            display: flex; flex-direction: column; padding: 20px; gap: 20px;
+            border-left: 1px solid #1e293b; border-right: 1px solid #1e293b;
         }
 
-        /* --- الجناح الأزرق/الأحمر: الرادار --- */
-        .wing-radar {
-            flex: 1; border-right: 1px solid rgba(0,242,255,0.2);
-            display: flex; flex-direction: column; padding: 25px; gap: 20px; background: rgba(0,0,0,0.4);
-        }
-
-        /* --- الرادار الكروي المتوهج --- */
+        /* الأقسام البصرية */
         .radar-box {
-            width: 250px; height: 250px; margin: 0 auto; border: 5px solid var(--nexa-blue);
-            border-radius: 50%; position: relative; overflow: hidden;
-            box-shadow: 0 0 25px var(--nexa-blue); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 180px; height: 180px; margin: 0 auto; border: 4px solid var(--nexa-blue);
+            border-radius: 50%; position: relative; overflow: hidden; transition: 0.3s;
         }
         .sweep {
             position: absolute; width: 100%; height: 100%; top: 0; left: 0;
-            background: conic-gradient(from 0deg, transparent, rgba(0, 242, 255, 0.4));
+            background: conic-gradient(from 0deg, transparent, rgba(0, 210, 255, 0.4));
             animation: rotate 2s linear infinite;
         }
-
-        /* حالات الرادار */
-        .alert-red { border-color: var(--nexa-red) !important; box-shadow: 0 0 50px var(--nexa-red) !important; background: rgba(255,0,85,0.1); }
-        .alert-gold { border-color: var(--nexa-gold) !important; box-shadow: 0 0 40px var(--nexa-gold) !important; }
-
-        /* --- صناديق التقارير العمودية --- */
-        .report-console {
-            flex: 1; border-radius: 15px; padding: 20px; font-family: 'Courier New', monospace;
-            font-size: 0.85rem; overflow-y: auto; line-height: 1.6;
-        }
-        .green-zone { border: 1px solid var(--nexa-green); background: rgba(0,255,136,0.03); color: var(--nexa-green); }
-        .red-zone { border: 1px solid var(--nexa-red); background: rgba(255,0,85,0.03); color: var(--nexa-red); }
-
-        .btn {
-            padding: 18px; border-radius: 12px; border: none; font-weight: 900; 
-            font-family: 'Orbitron'; cursor: pointer; text-transform: uppercase;
-        }
-        .btn-seal { background: var(--nexa-green); color: #000; box-shadow: 0 4px 15px rgba(0,255,136,0.3); }
-        .btn-radar { background: var(--nexa-blue); color: #000; box-shadow: 0 4px 15px rgba(0,242,255,0.3); }
-
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* الأزرار الاحترافية */
+        .nexa-btn {
+            padding: 15px; border-radius: 8px; border: none; font-family: 'Orbitron';
+            font-weight: 900; cursor: pointer; text-align: center; transition: 0.3s;
+            font-size: 0.8rem;
+        }
+        .btn-green { background: var(--nexa-green); color: #000; box-shadow: 0 0 15px var(--nexa-green); }
+        .btn-red { background: transparent; border: 2px solid var(--nexa-red); color: var(--nexa-red); }
+        .btn-blue { background: var(--nexa-blue); color: #000; }
+
+        /* سجل التقارير */
+        .console {
+            flex: 1; border-radius: 10px; padding: 15px; font-family: monospace;
+            font-size: 0.75rem; overflow-y: auto; background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .green-txt { color: var(--nexa-green); }
+        .red-txt { color: var(--nexa-red); }
+
+        /* الجدول المركزي */
+        .registry-table {
+            width: 100%; border-collapse: collapse; font-size: 0.8rem;
+        }
+        .registry-table th { padding: 10px; text-align: right; border-bottom: 2px solid var(--nexa-blue); color: var(--nexa-blue); }
+        .registry-table td { padding: 10px; border-bottom: 1px solid #1e293b; }
+
+        .status-pill { padding: 3px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; }
+        .pill-saved { background: var(--nexa-gold); color: #000; }
+        .pill-secure { background: var(--nexa-green); color: #000; }
     </style>
 </head>
 <body>
 
-    <section class="wing-seal">
-        <h2 style="font-family:'Orbitron'; color:var(--nexa-green);"><i class="fas fa-fingerprint"></i> SEALING WING</h2>
-        <button class="btn btn-seal" onclick="document.getElementById('inpS').click()">بدء الختم الجزيئي NXA</button>
-        <input type="file" id="inpS" hidden multiple onchange="sealAction(this)">
+    <aside class="wing sealing-wing">
+        <h3 style="font-family:'Orbitron'; color:var(--nexa-green); text-align: center;">MOLECULAR SEALING</h3>
+        <div style="text-align: center;"><i class="fas fa-dna fa-3x" style="color:var(--nexa-green);"></i></div>
         
-        <div class="report-console green-zone" id="sLogs">
-            > [STATUS] بانتظار الملفات للختم السيادي...
+        <button class="nexa-btn btn-green" onclick="document.getElementById('sealInp').click()">
+            ACTIVATE IMMORTAL SHIELD
+        </button>
+        <input type="file" id="sealInp" hidden multiple onchange="processSeal(this)">
+
+        <div class="console green-txt" id="sealLogs">
+            > [READY] نظام الختم بانتظار الملفات...
         </div>
         
-        <button onclick="connectWallet()" style="background:none; border:1px solid var(--nexa-green); color:var(--nexa-green); padding:10px; cursor:pointer; border-radius:8px;">
-            <i class="fab fa-ethereum"></i> توقيع MetaMask
+        <button onclick="connectWallet()" class="nexa-btn btn-blue" style="font-size:0.6rem;">
+            CONNECT METAMASK HUB
         </button>
-    </section>
+    </aside>
 
-    <section class="wing-radar">
-        <h2 style="font-family:'Orbitron'; color:var(--nexa-blue);">FORENSIC RADAR</h2>
+    <main class="central-hub">
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="font-family:'Orbitron'; color:var(--nexa-blue);">NEXA GLOBAL SOVEREIGN GRID</h2>
+            <div id="walletAddr" style="font-size: 0.7rem; color: var(--nexa-blue);">UNLINKED</div>
+        </header>
+
+        <div style="height: 150px; background: rgba(255,255,255,0.02); border-radius: 10px; padding: 10px;">
+            <canvas id="integrityChart"></canvas>
+        </div>
+
+        <div style="flex:1; overflow-y:auto;">
+            <table class="registry-table">
+                <thead>
+                    <tr>
+                        <th>Asset Name</th>
+                        <th>Molecular Hash</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="registryBody">
+                    </tbody>
+            </table>
+        </div>
+        
+        <footer style="font-size: 0.6rem; color: #64748b; text-align: center;">
+            NEXA OS v8.5 - ALL FILES MONITORED - QUANTUM SECURED
+        </footer>
+    </main>
+
+    <aside class="wing forensic-wing">
+        <h3 style="font-family:'Orbitron'; color:var(--nexa-red); text-align: center;">FORENSIC RADAR</h3>
+        
         <div class="radar-box" id="rBox">
             <div class="sweep" id="rSweep"></div>
-            <i class="fas fa-shield-virus fa-3x" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:inherit;"></i>
+            <i class="fas fa-biohazard fa-2x" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:inherit;"></i>
         </div>
 
-        <button class="btn btn-radar" onclick="document.getElementById('inpR').click()">تشغيل الرادار الكاشف</button>
-        <input type="file" id="inpR" hidden onchange="radarAction(this)">
+        <button class="nexa-btn btn-red" onclick="document.getElementById('radarInp').click()">
+            RUN QUANTUM SCAN
+        </button>
+        <input type="file" id="radarInp" hidden onchange="processRadar(this)">
 
-        <div class="report-console red-zone" id="rLogs">
-            > [RADAR] وضع البحث الأزرق نشط...
+        <div class="console red-txt" id="radarLogs">
+            > [RADAR] وضع كشف الاستغلال نشط...
         </div>
-    </section>
+    </aside>
 
 <script>
-let wallet = null, db = new Map();
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-// دالة إصدار أصوات الإنذار
-function playSignal(freq, type, duration) {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + duration);
-}
-
-function logS(m) { 
-    document.getElementById('sLogs').innerHTML = `<div>[${new Date().toLocaleTimeString()}] ✅ ${m}</div>` + document.getElementById('sLogs').innerHTML;
-}
-
-function logR(m, status='blue') {
-    const box = document.getElementById('rBox');
-    const swp = document.getElementById('rSweep');
-    const logs = document.getElementById('rLogs');
+    let wallet = null, db = new Map();
+    const ctx = document.getElementById('integrityChart').getContext('2d');
     
-    if(status === 'red') {
-        box.className = "radar-box alert-red";
-        swp.style.background = "conic-gradient(from 0deg, transparent, rgba(255, 0, 85, 0.7))";
-        logs.innerHTML = `<div style="color:var(--nexa-red); font-weight:bold;">🚨 [ALERT] ${m}</div>` + logs.innerHTML;
-        playSignal(150, 'sawtooth', 0.5); // صوت إنذار حاد
-    } else if(status === 'gold') {
-        box.className = "radar-box alert-gold";
-        swp.style.background = "conic-gradient(from 0deg, transparent, rgba(255, 204, 0, 0.7))";
-        logs.innerHTML = `<div style="color:var(--nexa-gold);">⚠️ [INFO] ${m}</div>` + logs.innerHTML;
-        playSignal(440, 'sine', 0.2); // صوت تنبيه هادئ
-    } else {
-        box.className = "radar-box";
-        swp.style.background = "conic-gradient(from 0deg, transparent, rgba(0, 242, 255, 0.4))";
-        logs.innerHTML = `<div>📡 [SCAN] ${m}</div>` + logs.innerHTML;
+    // رسم بياني محاكي لسلامة البيانات
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['1s', '2s', '3s', '4s', '5s', '6s'],
+            datasets: [{
+                label: 'Data Integrity Score',
+                data: [100, 100, 100, 100, 100, 100],
+                borderColor: '#00d2ff',
+                tension: 0.4
+            }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { display: false } } }
+    });
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function beep(f, t, d) {
+        const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+        o.type = t; o.frequency.value = f; g.gain.value = 0.1;
+        o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + d);
     }
-}
 
-async function connectWallet() {
-    const p = new ethers.providers.Web3Provider(window.ethereum);
-    const acc = await p.send("eth_requestAccounts", []);
-    wallet = acc[0]; logS("تم توثيق السيادة عبر المحفظة: " + wallet.substring(0,12));
-}
+    async function connectWallet() {
+        if(!window.ethereum) return;
+        const p = new ethers.providers.Web3Provider(window.ethereum);
+        const acc = await p.send("eth_requestAccounts", []);
+        wallet = acc[0];
+        document.getElementById('walletAddr').innerText = wallet.substring(0,15) + "...";
+        beep(880, 'sine', 0.2);
+    }
 
-async function sealAction(input) {
-    if(!wallet) return alert("يرجى تفعيل توقيع MetaMask أولاً");
-    for(const f of input.files) {
+    function processSeal(input) {
+        if(!wallet) return alert("Please Connect MetaMask Hub");
+        for(const f of input.files) {
+            const fr = new FileReader();
+            fr.onload = (e) => {
+                const h = CryptoJS.SHA256(CryptoJS.lib.WordArray.create(e.target.result)).toString();
+                db.set(f.name, h);
+                document.getElementById('sealLogs').innerHTML += `<div>> SEALED: ${f.name}</div>`;
+                addToTable(f.name, h, "SECURED", "pill-secure");
+                beep(1000, 'sine', 0.1);
+            };
+            fr.readAsArrayBuffer(f);
+        }
+    }
+
+    function processRadar(input) {
+        const f = input.files[0];
         const fr = new FileReader();
         fr.onload = (e) => {
             const h = CryptoJS.SHA256(CryptoJS.lib.WordArray.create(e.target.result)).toString();
-            logS(`بدء حقن الجزيئات لـ: ${f.name}`);
-            logS(`تم الختم الرقمي: ${h.substring(0,16)}`);
-            db.set(f.name, h);
-            playSignal(880, 'sine', 0.1);
+            const original = db.get(f.name);
+            const rBox = document.getElementById('rBox');
+            const rLogs = document.getElementById('radarLogs');
+
+            if(original) {
+                if(h === original) {
+                    rBox.style.borderColor = "var(--nexa-gold)";
+                    rLogs.innerHTML += `<div style="color:var(--nexa-gold)">> ALREADY SAVED: ${f.name}</div>`;
+                    beep(440, 'sine', 0.3);
+                } else {
+                    rBox.style.borderColor = "var(--nexa-red)";
+                    rBox.style.boxShadow = "0 0 50px var(--nexa-red)";
+                    rLogs.innerHTML += `<div style="color:var(--nexa-red)">> ALERT: TAMPERED CONTENT!</div>`;
+                    beep(150, 'sawtooth', 0.6);
+                    updateChart(50);
+                }
+            } else {
+                rLogs.innerHTML += `<div>> NEW CONTENT DETECTED</div>`;
+            }
         };
         fr.readAsArrayBuffer(f);
     }
-}
 
-async function radarAction(input) {
-    const f = input.files[0];
-    logR(`مسح جزيئي لـ: ${f.name}...`);
-    const fr = new FileReader();
-    fr.onload = (e) => {
-        const currentH = CryptoJS.SHA256(CryptoJS.lib.WordArray.create(e.target.result)).toString();
-        const originalH = db.get(f.name);
+    function addToTable(n, h, s, c) {
+        const row = `<tr><td>${n}</td><td style="font-family:monospace">${h.substring(0,15)}...</td><td><span class="status-pill ${c}">${s}</span></td></tr>`;
+        document.getElementById('registryBody').innerHTML = row + document.getElementById('registryBody').innerHTML;
+    }
 
-        if(originalH) {
-            if(currentH === originalH) {
-                logR(`محتوى [${f.name}] محفوظ ومسجل مسبقاً بنظام NXA.`, 'gold');
-            } else {
-                logR(`خطر: تم رصد تلاعب جنائي في محتوى [${f.name}]!`, 'red');
-            }
-        } else {
-            logR(`لا يوجد سجل سيادي لهذا الملف.`);
-        }
-    };
-    fr.readAsArrayBuffer(f);
-}
+    function updateChart(val) {
+        chart.data.datasets[0].data.push(val);
+        chart.data.datasets[0].data.shift();
+        chart.update();
+    }
 </script>
 </body>
 </html>
