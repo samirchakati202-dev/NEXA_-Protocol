@@ -1,206 +1,98 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEXA GLOBAL | OMNI-SYSTEM PREMIER</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexa Radar Pro</title>
+    <style>
+        /* خلفية غامقة توحي بالتكنولوجيا */
+        body { 
+            background-color: #050505; 
+            color: #00ff00; 
+            font-family: 'Courier New', Courier, monospace; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; 
+        }
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+        h1 { text-shadow: 0 0 10px #00ff00; font-size: 1.5rem; }
 
-<style>
-:root{
-  --cyan:#00f2ff; --green:#00ffaa; --red:#ff2d55; --royal:#4169e1;
-  --deep:#000; --glass:rgba(0,242,255,0.03)
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--deep);color:#fff;font-family:'Cairo',sans-serif;overflow-x:hidden;padding-bottom:60px}
+        /* حاوية الرادار */
+        .radar {
+            width: 280px; height: 280px;
+            border: 2px solid #004400;
+            border-radius: 50%;
+            position: relative;
+            background: repeating-radial-gradient(circle, #000 0%, #000 20%, #001100 21%, #001100 22%);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            overflow: hidden;
+        }
 
-/* Header */
-.nexa-header{
-  background:rgba(0,242,255,0.05);padding:15px;font-size:.8rem;
-  border-bottom:1px solid var(--cyan);display:flex;justify-content:space-between;
-  font-family:'Orbitron';letter-spacing:2px;
-}
+        /* الخطوط المتقاطعة داخل الرادار */
+        .radar::before {
+            content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: #004400;
+        }
+        .radar::after {
+            content: ''; position: absolute; left: 50%; top: 0; width: 1px; height: 100%; background: #004400;
+        }
 
-/* Radar */
-.radar-zone{text-align:center;padding:50px 10px;position:relative}
-.radar-disc{
-  width:260px;height:260px;border-radius:50%;border:3px solid var(--cyan);
-  margin:0 auto;display:flex;align-items:center;justify-content:center;
-  position:relative;transition:0.6s cubic-bezier(0.19, 1, 0.22, 1);
-  box-shadow:0 0 50px rgba(0,242,255,0.2);
-}
-.scan-line{
-  position:absolute;width:100%;height:3px;background:var(--cyan);
-  top:0; animation: scanMove 4s linear infinite; box-shadow:0 0 25px var(--cyan);
-}
-@keyframes scanMove{0%,100%{top:0%;opacity:0}50%{top:100%;opacity:1}}
+        /* شعاع المسح الضوئي */
+        .sweep {
+            width: 140px; height: 140px;
+            background: linear-gradient(45deg, rgba(0, 255, 0, 0.6) 0%, transparent 70%);
+            position: absolute; top: 0; left: 50%;
+            transform-origin: bottom left;
+            animation: rotate 3s linear infinite;
+            border-left: 1px solid rgba(0, 255, 0, 0.8);
+        }
 
-/* Radar statuses */
-.status-safe{border-color:var(--green)!important;box-shadow:0 0 70px var(--green)!important}
-.status-alert{border-color:var(--red)!important;box-shadow:0 0 90px var(--red)!important;animation:shake 0.4s infinite}
-.status-clone{border-color:var(--royal)!important;box-shadow:0 0 80px var(--royal)!important}
-@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-5px,0)}75%{transform:translate(5px,0)}}
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
-/* Operations grid */
-.ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:20px}
-.nexa-card{
-  background:var(--glass);border:1px solid rgba(0,242,255,0.15);padding:25px;text-align:center;cursor:pointer;transition:.3s;border-radius:10px
-}
-.nexa-card:hover{border-color:var(--cyan);background:rgba(0,242,255,0.1)}
-.nexa-card i{font-size:2.8rem;color:var(--cyan);margin-bottom:12px;display:block}
-.nexa-card h3{font-size:1rem;font-weight:900;letter-spacing:1px}
+        /* نقاط الأهداف الوهمية */
+        .point {
+            width: 4px; height: 4px; background: #00ff00; border-radius: 50%; position: absolute;
+            box-shadow: 0 0 10px #00ff00; opacity: 0; animation: blink 3s infinite;
+        }
 
-/* Ledger */
-.ledger-container{padding:20px}
-.ledger-header{font-family:'Orbitron';font-size:.85rem;color:var(--cyan);margin-bottom:15px;border-bottom:1px solid #111;padding-bottom:10px}
-.ledger-entry{
-  background:rgba(255,255,255,0.02);padding:14px;border-radius:5px;margin-bottom:10px;
-  border-right:3px solid var(--royal);display:flex;justify-content:space-between;align-items:center;
-}
+        @keyframes blink {
+            0%, 70% { opacity: 0; }
+            75% { opacity: 1; }
+            100% { opacity: 0; }
+        }
 
-/* Modal / Certificate */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.98);display:none;justify-content:center;align-items:center;z-index:10000;padding:10px
-}
-#certificateTemplate{
-  background:#000;border:2px solid var(--cyan);padding:35px;width:100%;max-width:450px;text-align:center;position:relative;border-radius:12px
-}
-.qr-box{background:#fff;padding:10px;width:200px;height:200px;margin:25px auto;border-radius:5px}
-.nexa-seal-text{background:var(--cyan);color:#000;padding:6px 25px;font-weight:900;display:inline-block;margin-bottom:20px;font-size:1rem;border-radius:5px}
-.msg-box{font-size:1rem;color:#fff;margin:20px 0;line-height:1.6}
-.id-label{font-family:'Orbitron';font-size:.65rem;color:#333;margin-top:25px;border-top:1px solid #111;padding-top:15px}
-.download-btn{background:var(--green);color:#000;border:none;padding:18px;font-weight:900;width:100%;margin-top:20px;cursor:pointer;letter-spacing:1px;border-radius:5px}
-</style>
+        button {
+            margin-top: 30px; background: transparent; color: #00ff00; border: 1px solid #00ff00;
+            padding: 10px 20px; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+
+        button:hover { background: #00ff00; color: #000; }
+    </style>
 </head>
-
 <body>
 
-<div class="nexa-header">
-  <span>NEXA GLOBAL | CORE V2.1</span>
-  <span style="color:var(--green)">SECURE NODE ACTIVE</span>
-</div>
+    <h1>SYSTEM: NEXA RADAR ACTIVE</h1>
 
-<div class="radar-zone">
-  <div id="radarDisc" class="radar-disc">
-    <div id="scanLine" class="scan-line"></div>
-    <i id="radarIcon" class="fas fa-atom fa-5xl" style="color:var(--cyan);font-size:5rem;"></i>
-  </div>
-  <h2 id="radarStatus" style="margin-top:30px;font-weight:900;">بانتظار تحليل الهوية...</h2>
-</div>
-
-<div class="ops-grid">
-  <div class="nexa-card" onclick="document.getElementById('sealInput').click()">
-    <i class="fas fa-fingerprint"></i>
-    <h3>ختم NEXA.SEAL</h3>
-  </div>
-  <div class="nexa-card" onclick="document.getElementById('auditInput').click()" style="border-color:var(--royal)">
-    <i class="fas fa-shield-halved" style="color:var(--royal)"></i>
-    <h3>تدقيق NEXA</h3>
-  </div>
-</div>
-
-<input type="file" id="sealInput" hidden onchange="nexaEngine(this,'seal')">
-<input type="file" id="auditInput" hidden onchange="nexaEngine(this,'audit')">
-
-<div class="ledger-container">
-  <div class="ledger-header">SOVEREIGN LEDGER (LOCAL)</div>
-  <div id="ledgerList"></div>
-</div>
-
-<div id="certModal" class="modal-overlay" onclick="this.style.display='none'">
-  <div style="text-align:center;">
-    <div id="certificateTemplate" onclick="event.stopPropagation()">
-      <div style="font-family:'Orbitron';color:var(--cyan);font-size:2rem;letter-spacing:5px;margin-bottom:12px;">NEXA GLOBAL</div>
-      <div class="nexa-seal-text">توثيق سيادي</div>
-      <div class="qr-box" id="qrOutput"></div>
-      <div class="msg-box">
-        هذا المحتوى محفوظ وموثق رسميًا بحقوق وشهادة <b>NEXA.SEAL Global</b>.
-      </div>
-      <div class="id-label" id="sigID">ID: ACCESSING_DATA...</div>
+    <div class="radar">
+        <div class="sweep"></div>
+        <div class="point" style="top: 20%; left: 30%; animation-delay: 0.5s;"></div>
+        <div class="point" style="top: 60%; left: 70%; animation-delay: 1.2s;"></div>
+        <div class="point" style="top: 40%; left: 50%; animation-delay: 2s;"></div>
     </div>
-    <button class="download-btn" onclick="exportSovereignImage()">
-      <i class="fas fa-file-export"></i> تحميل صك الملكية (PNG)
-    </button>
-  </div>
-</div>
 
-<script>
-const NexaDB={
-  save:(name,id)=>{let data=JSON.parse(localStorage.getItem('NEXA_MASTER_CHAIN')||'[]');if(!data.find(x=>x.id===id)){data.push({name,id,date:new Date().toLocaleString()});localStorage.setItem('NEXA_MASTER_CHAIN',JSON.stringify(data))}},
-  get:(id)=>JSON.parse(localStorage.getItem('NEXA_MASTER_CHAIN')||'[]').find(x=>x.id===id),
-  list:()=>JSON.parse(localStorage.getItem('NEXA_MASTER_CHAIN')||'[]')
-};
+    <button onclick="connect()">تفعيل الاتصال الآمن (Web3)</button>
+    <p id="msg">الحالة: غير متصل</p>
 
-function refreshLedger(){
-  const list=NexaDB.list();
-  document.getElementById('ledgerList').innerHTML=list.reverse().map(item=>`
-    <div class="ledger-entry">
-      <div><b>${item.name}</b><br><small style="color:var(--cyan);font-size:.6rem;">${item.id.substring(0,24)}...</small></div>
-      <i class="fas fa-certificate" style="color:var(--green)"></i>
-    </div>`).join('');
-}
-window.onload=refreshLedger;
-
-async function nexaEngine(input,mode){
-  const file=input.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=async(e)=>{
-    const hash=CryptoJS.SHA256(CryptoJS.lib.WordArray.create(e.target.result)).toString();
-    const sovID=`NEXA-${hash.slice(0,24).toUpperCase()}`;
-    const payload=`NEXA://seal?version=1.0&id=${sovID}&hash=${hash}&issuer=NEXA`;
-
-    const radar=document.getElementById('radarDisc');
-    const status=document.getElementById('radarStatus');
-    const icon=document.getElementById('radarIcon');
-
-    radar.className="radar-disc";
-    icon.style.color="var(--cyan)";
-    icon.className="fas fa-atom fa-5xl";
-
-    if(mode==='seal'){
-      if(NexaDB.get(sovID)){alert("محتوى مسجّل مسبقًا.");return;}
-      NexaDB.save(file.name,sovID);
-      refreshLedger();
-      showSovereignCert(payload);
-    }else{
-      const record=NexaDB.get(sovID);
-      if(record){
-        radar.classList.add("status-safe");
-        icon.className="fas fa-check-double";
-        icon.style.color="var(--green)";
-        status.innerHTML=`<span style="color:var(--green)">تطابق سيادي!</span><br><small>مسجل في: ${record.date}</small>`;
-      }else{
-        radar.classList.add("status-alert");
-        icon.className="fas fa-user-secret";
-        icon.style.color="var(--red)";
-        status.innerHTML=`<span style="color:var(--red)">تنبيه: محتوى غير موثق!</span>`;
-      }
-    }
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-function showSovereignCert(payload){
-  document.getElementById('sigID').innerText="ID: "+payload;
-  document.getElementById('qrOutput').innerHTML="";
-  new QRCode(document.getElementById("qrOutput"),{text:payload,width:200,height:200});
-  document.getElementById('certModal').style.display='flex';
-}
-
-function exportSovereignImage(){
-  html2canvas(document.getElementById('certificateTemplate'),{backgroundColor:'#000',scale:2}).then(canvas=>{
-    const link=document.createElement('a');
-    link.download=`NEXA_CERTIFICATE_${Date.now()}.png`;
-    link.href=canvas.toDataURL("image/png");
-    link.click();
-  });
-}
-</script>
-
+    <script>
+        async function connect() {
+            if (window.ethereum) {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                document.getElementById('msg').innerText = "تم الاتصال: " + accounts[0];
+                document.getElementById('msg').style.color = "#fff";
+            } else {
+                alert("افتح الرادار داخل MetaMask لتفعيل الاتصال بالبلوكشين!");
+            }
+        }
+    </script>
 </body>
 </html>
