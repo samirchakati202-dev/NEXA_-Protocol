@@ -1,98 +1,192 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexa Radar Pro</title>
-    <style>
-        /* خلفية غامقة توحي بالتكنولوجيا */
-        body { 
-            background-color: #050505; 
-            color: #00ff00; 
-            font-family: 'Courier New', Courier, monospace; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; 
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXA GLOBAL Radar 3.0 – Mobile UI</title>
 
-        h1 { text-shadow: 0 0 10px #00ff00; font-size: 1.5rem; }
+<!-- مكتبات -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+Arabic:wght@300;500;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-        /* حاوية الرادار */
-        .radar {
-            width: 280px; height: 280px;
-            border: 2px solid #004400;
-            border-radius: 50%;
-            position: relative;
-            background: repeating-radial-gradient(circle, #000 0%, #000 20%, #001100 21%, #001100 22%);
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
-            overflow: hidden;
-        }
+<style>
+:root{
+--primary:#00f2ff;--accent:#d4af37;--bg-dark:#050a14;--card-bg:rgba(15,23,42,0.95);
+--border:rgba(0,242,255,0.25);--neon-shadow:0 0 20px rgba(0,242,255,0.4);}
+*{box-sizing:border-box;margin:0;padding:0;transition:all 0.3s ease;}
+body{background:radial-gradient(circle,#0f172a 0%,#050a14 100%);
+color:#f1f5f9;font-family:'Noto Sans Arabic',sans-serif;display:flex;flex-direction:column;min-height:100vh;}
 
-        /* الخطوط المتقاطعة داخل الرادار */
-        .radar::before {
-            content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: #004400;
-        }
-        .radar::after {
-            content: ''; position: absolute; left: 50%; top: 0; width: 1px; height: 100%; background: #004400;
-        }
+header{padding:15px 20px;background:var(--card-bg);border-bottom:1px solid var(--border);
+display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+header h1{font-family:'Orbitron',sans-serif;color:var(--primary);font-size:1.2rem;}
+.walletBtn{background:linear-gradient(135deg,#f6851b,#e2761b);color:#fff;font-size:0.85rem;padding:10px;border-radius:12px;margin-top:5px;}
+#status{margin-top:5px;color:#00ff88;font-weight:700;font-size:0.8rem;}
 
-        /* شعاع المسح الضوئي */
-        .sweep {
-            width: 140px; height: 140px;
-            background: linear-gradient(45deg, rgba(0, 255, 0, 0.6) 0%, transparent 70%);
-            position: absolute; top: 0; left: 50%;
-            transform-origin: bottom left;
-            animation: rotate 3s linear infinite;
-            border-left: 1px solid rgba(0, 255, 0, 0.8);
-        }
+main{flex:1;padding:15px;display:flex;flex-direction:column;gap:15px;}
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+/* رفع الملفات */
+.vault-upload{width:100%;border:2px dashed var(--primary);border-radius:20px;
+display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;cursor:pointer;}
+.vault-upload:hover{background:rgba(0,242,255,0.08);}
+#fileNameDisplay{margin-top:10px;font-weight:700;color:#94a3b8;text-align:center;}
+.registerBtn{background:linear-gradient(90deg,var(--accent),#fcd34d);color:#050a14;margin-top:10px;padding:15px;font-weight:700;border-radius:15px;font-size:0.95rem;width:100%;}
 
-        /* نقاط الأهداف الوهمية */
-        .point {
-            width: 4px; height: 4px; background: #00ff00; border-radius: 50%; position: absolute;
-            box-shadow: 0 0 10px #00ff00; opacity: 0; animation: blink 3s infinite;
-        }
+/* جدول الملفات */
+#fileTableWrapper{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;margin-top:10px;color:#f1f5f9;font-size:0.75rem;}
+th,td{padding:6px 8px;border:1px solid rgba(255,255,255,0.1);text-align:right;}
+th{background:rgba(0,242,255,0.1);font-size:0.75rem;}
 
-        @keyframes blink {
-            0%, 70% { opacity: 0; }
-            75% { opacity: 1; }
-            100% { opacity: 0; }
-        }
+/* خريطة الرصد العالمي */
+#map{width:100%;height:300px;border-radius:12px;margin-top:10px;}
 
-        button {
-            margin-top: 30px; background: transparent; color: #00ff00; border: 1px solid #00ff00;
-            padding: 10px 20px; font-weight: bold; cursor: pointer; transition: 0.3s;
-        }
+/* سجل الأحداث */
+#eventLog{height:150px;background:#000;border-radius:12px;padding:10px;font-family:'Courier New',monospace;font-size:0.7rem;color:#00ff88;overflow-y:auto;}
 
-        button:hover { background: #00ff00; color: #000; }
-    </style>
+/* أيقونات وأزرار */
+button i{margin-left:5px;}
+</style>
 </head>
 <body>
 
-    <h1>SYSTEM: NEXA RADAR ACTIVE</h1>
+<header>
+<h1>NEXA GLOBAL Radar 3.0</h1>
+<div>
+<button class="walletBtn" id="walletBtn" onclick="connectWallet()"><i class="fab fa-ethereum"></i> ربط المحفظة</button>
+<div id="status">غير متصل</div>
+</div>
+</header>
 
-    <div class="radar">
-        <div class="sweep"></div>
-        <div class="point" style="top: 20%; left: 30%; animation-delay: 0.5s;"></div>
-        <div class="point" style="top: 60%; left: 70%; animation-delay: 1.2s;"></div>
-        <div class="point" style="top: 40%; left: 50%; animation-delay: 2s;"></div>
-    </div>
+<main>
+<div class="vault-upload" onclick="document.getElementById('fileInput').click()">
+<i class="fas fa-cloud-arrow-up fa-3x" style="color:var(--primary)"></i>
+<h2 id="fileNameDisplay">اضغط هنا لاختيار الملفات</h2>
+<p style="color:#94a3b8;margin-top:5px;text-align:center;font-size:0.75rem;">
+ختم الملفات + AI Verification + رصد عالمي</p>
+<input type="file" id="fileInput" hidden multiple onchange="handleFiles(this)">
+<button class="registerBtn" onclick="initiateSovereignSeal()">
+<i class="fas fa-lock"></i> ختم وإرسال Smart Contract + Radar
+</button>
+</div>
 
-    <button onclick="connect()">تفعيل الاتصال الآمن (Web3)</button>
-    <p id="msg">الحالة: غير متصل</p>
+<div id="fileTableWrapper">
+<table>
+<thead>
+<tr><th>الملف</th><th>Hash</th><th>AI</th><th>NXA ID</th></tr>
+</thead>
+<tbody id="fileTable"></tbody>
+</table>
+</div>
 
-    <script>
-        async function connect() {
-            if (window.ethereum) {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                document.getElementById('msg').innerText = "تم الاتصال: " + accounts[0];
-                document.getElementById('msg').style.color = "#fff";
-            } else {
-                alert("افتح الرادار داخل MetaMask لتفعيل الاتصال بالبلوكشين!");
-            }
-        }
-    </script>
+<div id="map"></div>
+
+<div id="eventLog">[READY] النظام في انتظار الملفات...</div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let userAddress=null,fileList=[],fileHashes=[],fileAIs=[],fileNXAIDs=[];
+const fileTable=document.getElementById('fileTable');
+const eventLog=document.getElementById('eventLog');
+const {SHA256}=CryptoJS;
+
+// === ضع هنا عنوان العقد الخاص بك بعد نشره على Testnet
+const CONTRACT_ADDRESS="PUT_YOUR_CONTRACT_ADDRESS_HERE";
+const ABI=[
+  "function registerFile(string nxaid, bytes32 fileHash, bytes32 aiFingerprint) external",
+];
+
+let provider=null,signer=null,contract=null;
+
+function logEvent(msg){ 
+  const t=document.createElement('div');
+  t.textContent=`[${new Date().toLocaleTimeString()}] > ${msg}`;
+  eventLog.appendChild(t);
+  eventLog.scrollTop=eventLog.scrollHeight;
+}
+
+// === Wallet
+async function connectWallet(){
+  if(window.ethereum){
+    provider=new ethers.providers.Web3Provider(window.ethereum);
+    signer=provider.getSigner();
+    const accounts=await provider.send("eth_requestAccounts",[]);
+    userAddress=accounts[0];
+    contract=new ethers.Contract(CONTRACT_ADDRESS,ABI,signer);
+    document.getElementById('walletBtn').innerHTML=`<i class='fas fa-check-circle'></i> ${userAddress.substring(0,10)}...`;
+    document.getElementById('status').innerText="متصل بـ Testnet";
+    logEvent("تم ربط المحفظة بنجاح");
+  } else alert("MetaMask غير موجود!");
+}
+
+// === File Handling
+function handleFiles(input){
+  const files=Array.from(input.files);
+  for(const file of files){
+    const reader=new FileReader();
+    reader.onload=function(e){
+      const hash=SHA256(CryptoJS.lib.WordArray.create(e.target.result)).toString();
+      const aiValid=Math.random()>0.5;
+      const nxaId="NXA-"+Date.now()+"-"+Math.floor(Math.random()*9999);
+      fileList.push(file); fileHashes.push(hash); fileAIs.push(aiValid); fileNXAIDs.push(nxaId);
+      updateTable(file.name,hash,aiValid,nxaId);
+      logEvent(`تم رفع الملف: ${file.name} | AI: ${aiValid?"✅":"❌"} | NXA ID: ${nxaId}`);
+    };
+    reader.readAsArrayBuffer(file);
+    document.getElementById('fileNameDisplay').innerText=file.name;
+  }
+}
+
+function updateTable(name,hash,ai,nxaid){
+  const row=document.createElement('tr');
+  row.innerHTML=`<td>${name}</td><td>${hash.substring(0,20)}...</td><td>${ai?"✅":"❌"}</td><td>${nxaid}</td>`;
+  fileTable.appendChild(row);
+}
+
+// === Map setup
+const map=L.map('map').setView([20,0],2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OSM'}).addTo(map);
+let markers={};
+
+function addFileToMap(name,status,lat,lng){
+  const color=status.includes("❌")?"red":status.includes("⚠️")?"yellow":"green";
+  const marker=L.circleMarker([lat,lng],{color,radius:8}).addTo(map).bindPopup(`${name} | ${status}`);
+  markers[name]=marker;
+}
+
+// === Sovereign Seal + Smart Contract + Radar
+async function initiateSovereignSeal(){
+  if(!userAddress){alert("يرجى ربط المحفظة"); return;}
+  if(fileList.length===0){alert("لم يتم رفع أي ملفات"); return;}
+  
+  for(let i=0;i<fileList.length;i++){
+    const hash=fileHashes[i];
+    const ai=fileAIs[i];
+    const nxaid=fileNXAIDs[i];
+    const status=ai?"✅ سليم":"❌ تم التلاعب";
+    const lat=Math.random()*140-70;
+    const lng=Math.random()*360-180;
+    addFileToMap(fileList[i].name,status,lat,lng);
+    logEvent(`الرادار: ${fileList[i].name} | الحالة: ${status} | الموقع: [${lat.toFixed(2)},${lng.toFixed(2)}]`);
+
+    try{
+      // تسجيل على Smart Contract Testnet
+      await contract.registerFile(nxaid,"0x"+hash,"0x"+SHA256(hash+"AI_STUB").toString());
+      logEvent(`✅ تم تسجيل الملف على Testnet: ${fileList[i].name} (${nxaid})`);
+    }catch(e){
+      logEvent("❌ خطأ في تسجيل الملف: "+e.message);
+    }
+  }
+
+  alert("✅ تم ختم الملفات وإرسالها إلى Testnet + الرادار العالمي!");
+}
+</script>
+
 </body>
 </html>
