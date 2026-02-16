@@ -3,128 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AGP7 | الهاتف المبتكر</title>
+    <title>AGP7 | SOVEREIGN CORE</title>
     <style>
-        :root { --neon: #00ff41; --dim: #003311; --bg: #000; }
+        :root { --main: #00ff41; --sec: #bc13fe; --bg: #000; --card: #0a0a0a; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--neon); font-family: 'Segoe UI', monospace; margin: 0; overflow: hidden; height: 100vh; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; overflow-x: hidden; display: flex; flex-direction: column; height: 100vh; }
 
-        /* واجهة النظام السيادي */
-        .nexus-ui { display: flex; flex-direction: column; height: 100vh; padding: 20px; justify-content: space-between; }
+        /* الشاشة الافتتاحية */
+        #boot-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+        .glitch-text { font-size: 1.2rem; color: var(--main); letter-spacing: 5px; margin-bottom: 20px; }
+
+        /* الواجهة الرئيسية */
+        .nexus-ui { flex: 1; display: flex; flex-direction: column; padding: 15px; display: none; }
+        .header { display: flex; justify-content: space-between; font-size: 0.7rem; border-bottom: 1px solid #111; padding-bottom: 10px; color: var(--main); }
+
+        /* الرادار المتطور */
+        .visual-core { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; margin: 20px 0; }
+        canvas { position: absolute; width: 100%; height: 100%; max-width: 400px; }
+        .crosshair { position: absolute; width: 40px; height: 40px; border: 1px solid var(--sec); border-radius: 50%; z-index: 10; pointer-events: none; }
+
+        /* لوحة التحكم الفيزيائية */
+        .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+        .metric-box { background: var(--card); border: 1px solid #1a1a1a; padding: 12px; border-radius: 10px; }
+        .metric-box small { display: block; font-size: 0.5rem; color: #444; margin-bottom: 5px; }
+        .metric-box span { font-size: 0.85rem; color: var(--main); font-weight: bold; }
+
+        /* زر التفعيل الكبير */
+        .action-btn { width: 100%; padding: 20px; background: var(--main); color: #000; border: none; border-radius: 15px; font-weight: 900; letter-spacing: 3px; cursor: pointer; transition: 0.3s; }
+        .action-btn:active { transform: scale(0.95); background: #fff; }
+
+        #log { font-size: 0.6rem; color: #333; height: 40px; overflow-y: auto; margin-top: 10px; text-align: center; }
         
-        .header { display: flex; justify-content: space-between; font-size: 0.7rem; border-bottom: 1px solid var(--dim); padding-bottom: 10px; }
-
-        /* الرادار المركزي */
-        .core-visual { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; }
-        .ring { position: absolute; border: 1px solid var(--dim); border-radius: 50%; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        #mag-ring { width: 200px; height: 200px; }
-        #baro-ring { width: 150px; height: 150px; border-style: dashed; }
-        .pointer { position: absolute; width: 12px; height: 12px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 15px var(--neon); }
-
-        /* لوحة البيانات */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: #050505; border: 1px solid #111; padding: 15px; border-radius: 12px; }
-        .stat-card small { display: block; font-size: 0.5rem; color: #444; margin-bottom: 5px; }
-        .stat-card span { font-size: 0.9rem; font-weight: bold; }
-
-        .btn-lock { width: 100%; padding: 20px; background: var(--neon); color: #000; border: none; border-radius: 15px; font-weight: 900; letter-spacing: 2px; }
-        
-        #access-status { text-align: center; font-size: 0.8rem; margin-top: 10px; color: #444; }
+        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+        .loading { animation: pulse 1s infinite; }
     </style>
 </head>
 <body>
 
-<div class="nexus-ui">
+<div id="boot-screen">
+    <div class="glitch-text">AGP7 SOVEREIGN SYSTEM</div>
+    <p style="color: #333; font-size: 0.8rem;">نظام استشعار المحيط الفيزيائي المتكامل</p>
+    <button class="action-btn" onclick="requestFullAccess()">بدء المزامنة السيادية</button>
+    <div id="setup-log" style="font-size: 0.6rem; color: #444; margin-top: 20px;">إنتظار تفويض المستشعرات...</div>
+</div>
+
+<div class="nexus-ui" id="main-ui">
     <div class="header">
-        <span>AGP7_OS_v7.0</span>
+        <span>ID: AGP-77-ACTIVE</span>
         <span id="clock">00:00:00</span>
     </div>
 
-    <div class="core-visual">
-        <div class="ring" id="mag-ring"></div>
-        <div class="ring" id="baro-ring"></div>
-        <div class="pointer" id="tracker"></div>
-        <div style="font-size: 0.6rem; color: #222; position: absolute;">PHYSICAL_SYNC</div>
+    <div class="visual-core">
+        <div class="crosshair" id="target"></div>
+        <canvas id="radar-canvas"></canvas>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <small>الضغط (الارتفاع)</small>
-            <span id="val-baro">----</span>
-        </div>
-        <div class="stat-card">
-            <small>المغناطيسية</small>
-            <span id="val-mag">----</span>
-        </div>
-        <div class="stat-card" style="grid-column: span 2;">
-            <small>بصمة الاستقرار (التوازن الجسدي)</small>
-            <div id="integrity-bar" style="height:4px; background:#111; margin-top:5px; border-radius:2px;">
-                <div id="integrity-fill" style="height:100%; width:0%; background:var(--neon); transition: 0.5s;"></div>
-            </div>
+    <div class="metrics">
+        <div class="metric-box"><small>الحقل المغناطيسي</small><span id="mag-val">0.00 µT</span></div>
+        <div class="metric-box"><small>زاوية الميلان</small><span id="tilt-val">0.00°</span></div>
+        <div class="metric-box"><small>الضغط الجوي</small><span id="baro-val">READING...</span></div>
+        <div class="metric-box"><small>الحالة الأمنية</small><span id="auth-status">LOCKED</span></div>
+    </div>
+
+    <div class="metric-box" style="margin-bottom: 15px;">
+        <small>بصمة الاستقرار المكاني</small>
+        <div style="height:4px; background:#111; margin-top:5px; border-radius:2px;">
+            <div id="integrity-bar" style="height:100%; width:0%; background:var(--main); transition: 0.3s;"></div>
         </div>
     </div>
 
-    <div>
-        <button class="btn-lock" onclick="activateNexus()">تفعيل القفل الفيزيائي</button>
-        <div id="access-status">بانتظار مزامنة الواقع...</div>
-    </div>
+    <div id="log">بدء رصد التدفق الفيزيائي...</div>
+    <button class="action-btn" style="background: transparent; border: 1px solid var(--main); color: var(--main);" onclick="calibrate()">معايرة الموقع الحالي</button>
 </div>
 
 <script>
-    let savedProfile = null;
+    let audioCtx, analyser, dataArray, canvas, ctx;
+    let baseMag = null, baseTilt = null;
 
-    function updateClock() {
+    // تحديث الساعة
+    setInterval(() => {
         document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-    }
-    setInterval(updateClock, 1000);
+    }, 1000);
 
-    async function activateNexus() {
-        // 1. طلب صلاحيات المستشعرات
-        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-            const permission = await DeviceOrientationEvent.requestPermission();
-            if (permission !== 'granted') return alert("تحتاج للسماح بالوصول للمستشعرات.");
+    // طلب الوصول الشامل للمستشعرات
+    async function requestFullAccess() {
+        const setupLog = document.getElementById('setup-log');
+        setupLog.innerText = "جاري طلب إذن الوصول للمستشعرات...";
+
+        try {
+            // طلب إذن الحركة (iOS)
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                const permission = await DeviceOrientationEvent.requestPermission();
+                if (permission !== 'granted') throw new Error("تم رفض إذن الحركة");
+            }
+
+            // تفعيل الصوت
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const source = audioCtx.createMediaStreamSource(stream);
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 256;
+            source.connect(analyser);
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+            // إخفاء شاشة البوت وإظهار الواجهة
+            document.getElementById('boot-screen').style.display = 'none';
+            document.getElementById('main-ui').style.display = 'flex';
+            
+            initSystem();
+        } catch (err) {
+            setupLog.innerHTML = `<span style="color:red">خطأ: ${err.message}</span><br>تأكد من استخدام رابط HTTPS وتفعيل المستشعرات في إعدادات المتصفح.`;
         }
+    }
 
-        window.addEventListener('deviceorientation', handleMotion);
+    function initSystem() {
+        canvas = document.getElementById('radar-canvas');
+        ctx = canvas.getContext('2d');
+        resize();
+        window.addEventListener('resize', resize);
+        window.addEventListener('deviceorientation', handleOrientation);
         
-        // 2. تفعيل مستشعر الضغط (إذا كان مدعوماً في المتصفح)
         if ('Barometer' in window) {
             const baro = new Barometer({frequency: 10});
             baro.addEventListener('reading', () => {
-                const p = baro.pressure.toFixed(2);
-                document.getElementById('val-baro').innerText = p + " hPa";
-                checkIntegrity(p);
+                document.getElementById('baro-val').innerText = baro.pressure.toFixed(2) + " hPa";
             });
             baro.start();
-        } else {
-            document.getElementById('val-baro').innerText = "غير مدعوم";
         }
 
-        document.getElementById('access-status').innerText = "النظام يراقب الواقع الآن...";
+        render();
     }
 
-    function handleMotion(e) {
-        const mag = e.alpha.toFixed(1);
-        const tilt = e.beta.toFixed(1);
-        document.getElementById('val-mag').innerText = mag + "µT";
+    function handleOrientation(e) {
+        const mag = e.alpha.toFixed(2);
+        const tilt = e.beta.toFixed(2);
+        const gamma = e.gamma.toFixed(2);
         
-        // تحريك واجهة المستخدم بناءً على فيزياء الهاتف
-        const tracker = document.getElementById('tracker');
-        tracker.style.transform = `translate(${e.gamma}px, ${e.beta}px)`;
-        
-        document.getElementById('mag-ring').style.transform = `rotate(${mag}deg)`;
+        document.getElementById('mag-val').innerText = mag + " µT";
+        document.getElementById('tilt-val').innerText = tilt + "°";
+
+        // تحريك المؤشر بناءً على الجاذبية
+        const target = document.getElementById('target');
+        const x = (window.innerWidth/2) + (gamma * 2);
+        const y = (window.innerHeight/2) + (tilt * 2);
+        // target.style.left = x + 'px'; // معطل حالياً لعدم التشويش على الرادار
     }
 
-    function checkIntegrity(currentPressure) {
-        // خوارزمية افتراضية: إذا كان الضغط مستقراً والهاتف متوازن
-        let integrity = Math.random() * 100; // هنا نضع خوارزمية المطابقة الحقيقية
-        document.getElementById('integrity-fill').style.width = integrity + "%";
-        
-        if(integrity > 95) {
-            document.getElementById('access-status').innerText = "تم التحقق: أنت في موقعك السيادي";
-            document.getElementById('access-status').style.color = "var(--neon)";
+    function calibrate() {
+        baseMag = parseFloat(document.getElementById('mag-val').innerText);
+        baseTilt = parseFloat(document.getElementById('tilt-val').innerText);
+        document.getElementById('log').innerText = "تم تثبيت البصمة الفيزيائية لهذا المكان.";
+    }
+
+    function render() {
+        analyser.getByteFrequencyData(dataArray);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // رسم دوائر الرادار
+        ctx.strokeStyle = '#111';
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, 80, 0, Math.PI*2);
+        ctx.stroke();
+
+        // رسم الموجة الصوتية (رنين الغرفة)
+        ctx.strokeStyle = varColor('--main');
+        ctx.beginPath();
+        let angleStep = (Math.PI * 2) / dataArray.length;
+        for(let i=0; i<dataArray.length; i++) {
+            let angle = i * angleStep;
+            let radius = 80 + (dataArray[i] * 0.5);
+            let x = canvas.width/2 + Math.cos(angle) * radius;
+            let y = canvas.height/2 + Math.sin(angle) * radius;
+            if(i==0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
         }
+        ctx.closePath();
+        ctx.stroke();
+
+        // حساب الاستقرار
+        if(baseMag) {
+            let currentMag = parseFloat(document.getElementById('mag-val').innerText);
+            let diff = Math.abs(currentMag - baseMag);
+            let integrity = Math.max(0, 100 - (diff * 2));
+            document.getElementById('integrity-bar').style.width = integrity + "%";
+            
+            if(integrity > 90) {
+                document.getElementById('auth-status').innerText = "UNLOCKED";
+                document.getElementById('auth-status').style.color = varColor('--main');
+            } else {
+                document.getElementById('auth-status').innerText = "LOCKED";
+                document.getElementById('auth-status').style.color = "red";
+            }
+        }
+
+        requestAnimationFrame(render);
     }
+
+    function varColor(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    function log(m) { document.getElementById('log').innerText = m; }
 </script>
 </body>
 </html>
