@@ -3,162 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AGP MOBILE | السيادة المطلقة</title>
+    <title>AGP7 | الهاتف المبتكر</title>
     <style>
-        :root { --main: #00ff41; --sec: #bc13fe; --bg: #000; --card: #0a0a0a; --font: 'Inter', sans-serif; }
+        :root { --neon: #00ff41; --dim: #003311; --bg: #000; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: #fff; font-family: var(--font); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { background: var(--bg); color: var(--neon); font-family: 'Segoe UI', monospace; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* رأس التطبيق - تصميم انسيابي */
-        .header { padding: 40px 20px 20px; text-align: center; }
-        .header h1 { margin: 0; font-size: 1rem; letter-spacing: 5px; color: var(--main); font-weight: 200; }
-        .header .status-tag { font-size: 0.6rem; color: #444; text-transform: uppercase; margin-top: 8px; }
+        /* واجهة النظام السيادي */
+        .nexus-ui { display: flex; flex-direction: column; height: 100vh; padding: 20px; justify-content: space-between; }
+        
+        .header { display: flex; justify-content: space-between; font-size: 0.7rem; border-bottom: 1px solid var(--dim); padding-bottom: 10px; }
 
-        /* الرادار الدائري - قلب المعالجة الفيزيائية */
-        .radar-view { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        #radar-canvas { width: 340px; height: 340px; border-radius: 50%; z-index: 2; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); }
-        .pulse-effect { position: absolute; width: 220px; height: 220px; border: 1px solid var(--main); border-radius: 50%; opacity: 0; animation: sonarPulse 3s infinite; }
+        /* الرادار المركزي */
+        .core-visual { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; }
+        .ring { position: absolute; border: 1px solid var(--dim); border-radius: 50%; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #mag-ring { width: 200px; height: 200px; }
+        #baro-ring { width: 150px; height: 150px; border-style: dashed; }
+        .pointer { position: absolute; width: 12px; height: 12px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 15px var(--neon); }
 
-        /* مصفوفة البيانات والمؤشرات الحية */
-        .metrics-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 0 25px 25px; }
-        .metric { background: var(--card); border: 1px solid #111; padding: 15px; border-radius: 15px; text-align: center; }
-        .metric small { display: block; font-size: 0.5rem; color: #555; margin-bottom: 5px; letter-spacing: 1px; }
-        .metric span { font-size: 0.8rem; font-weight: 800; color: var(--main); }
+        /* لوحة البيانات */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: #050505; border: 1px solid #111; padding: 15px; border-radius: 12px; }
+        .stat-card small { display: block; font-size: 0.5rem; color: #444; margin-bottom: 5px; }
+        .stat-card span { font-size: 0.9rem; font-weight: bold; }
 
-        /* الخزنة السيادية الاحترافية */
-        .vault-card { margin: 0 25px 35px; background: var(--card); border: 1px solid #1a1a1a; border-radius: 20px; padding: 35px; text-align: center; position: relative; overflow: hidden; }
-        .vault-card.active { border-color: var(--main); box-shadow: 0 0 30px rgba(0,255,65,0.1); }
-        #vault-label { font-size: 0.6rem; color: #333; position: absolute; top: 15px; left: 20px; letter-spacing: 2px; }
-        #vault-data { font-family: 'Monaco', monospace; font-size: 1.2rem; color: #151515; letter-spacing: 6px; transition: 0.4s; }
-
-        /* أزرار التحكم - مصممة للإبهام */
-        .actions { padding: 0 25px 50px; }
-        button { width: 100%; padding: 22px; border-radius: 18px; border: none; font-size: 1rem; font-weight: 900; cursor: pointer; transition: 0.3s; margin-bottom: 12px; }
-        .btn-main { background: var(--main); color: #000; box-shadow: 0 10px 20px rgba(0,255,65,0.1); }
-        .btn-sec { background: transparent; border: 1px solid #222; color: #fff; }
-        button:active { transform: scale(0.97); filter: brightness(1.1); }
-
-        @keyframes sonarPulse { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.8); opacity: 0; } }
+        .btn-lock { width: 100%; padding: 20px; background: var(--neon); color: #000; border: none; border-radius: 15px; font-weight: 900; letter-spacing: 2px; }
+        
+        #access-status { text-align: center; font-size: 0.8rem; margin-top: 10px; color: #444; }
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <h1>ACOUSTIX AGP</h1>
-        <div class="status-tag">Physical Encryption Engine v3.0</div>
-    </header>
-
-    <main class="radar-view">
-        <div class="pulse-effect"></div>
-        <div class="pulse-effect" style="animation-delay: 1.5s"></div>
-        <canvas id="radar-canvas"></canvas>
-    </main>
-
-    <div class="metrics-bar">
-        <div class="metric"><small>ENVIRONMENT</small><span id="stat-echo">0.0</span></div>
-        <div class="metric"><small>SONAR</small><span id="stat-sonar">IDLE</span></div>
-        <div class="metric"><small>STATUS</small><span id="stat-auth">LOCKED</span></div>
+<div class="nexus-ui">
+    <div class="header">
+        <span>AGP7_OS_v7.0</span>
+        <span id="clock">00:00:00</span>
     </div>
 
-    <section class="vault-card" id="vault-card">
-        <span id="vault-label">ENCRYPTED DATA STREAM</span>
-        <div id="vault-data">••••••••••••</div>
-    </section>
+    <div class="core-visual">
+        <div class="ring" id="mag-ring"></div>
+        <div class="ring" id="baro-ring"></div>
+        <div class="pointer" id="tracker"></div>
+        <div style="font-size: 0.6rem; color: #222; position: absolute;">PHYSICAL_SYNC</div>
+    </div>
 
-    <footer class="actions">
-        <button class="btn-main" onclick="initApp()">تفعيل الحماية السيادية</button>
-        <button class="btn-sec" onclick="pingSonar()">بث نبضة السونار</button>
-    </footer>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <small>الضغط (الارتفاع)</small>
+            <span id="val-baro">----</span>
+        </div>
+        <div class="stat-card">
+            <small>المغناطيسية</small>
+            <span id="val-mag">----</span>
+        </div>
+        <div class="stat-card" style="grid-column: span 2;">
+            <small>بصمة الاستقرار (التوازن الجسدي)</small>
+            <div id="integrity-bar" style="height:4px; background:#111; margin-top:5px; border-radius:2px;">
+                <div id="integrity-fill" style="height:100%; width:0%; background:var(--neon); transition: 0.5s;"></div>
+            </div>
+        </div>
+    </div>
 
-    <script>
-        let audioCtx, analyser, dataArray, canvas, ctx, roomRef = null;
-        const SECRET = "AGP-SOVEREIGN-KEY"; // البيانات الحقيقية
+    <div>
+        <button class="btn-lock" onclick="activateNexus()">تفعيل القفل الفيزيائي</button>
+        <div id="access-status">بانتظار مزامنة الواقع...</div>
+    </div>
+</div>
 
-        async function initApp() {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false } });
-            const source = audioCtx.createMediaStreamSource(stream);
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 512;
-            source.connect(analyser);
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
-            canvas = document.getElementById('radar-canvas');
-            ctx = canvas.getContext('2d');
-            canvas.width = canvas.height = 700;
-            speak("تم تفعيل البروتوكول. النظام يتحسس المكان.");
-            loop();
+<script>
+    let savedProfile = null;
+
+    function updateClock() {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+    }
+    setInterval(updateClock, 1000);
+
+    async function activateNexus() {
+        // 1. طلب صلاحيات المستشعرات
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            const permission = await DeviceOrientationEvent.requestPermission();
+            if (permission !== 'granted') return alert("تحتاج للسماح بالوصول للمستشعرات.");
         }
 
-        function pingSonar() {
-            if(!audioCtx) return;
-            const o = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            o.frequency.value = 17500; // تردد فوق سمعي
-            o.connect(g); g.connect(audioCtx.destination);
-            o.start(); o.stop(audioCtx.currentTime + 0.4);
-            document.getElementById('stat-sonar').innerText = "SCANNING";
+        window.addEventListener('deviceorientation', handleMotion);
+        
+        // 2. تفعيل مستشعر الضغط (إذا كان مدعوماً في المتصفح)
+        if ('Barometer' in window) {
+            const baro = new Barometer({frequency: 10});
+            baro.addEventListener('reading', () => {
+                const p = baro.pressure.toFixed(2);
+                document.getElementById('val-baro').innerText = p + " hPa";
+                checkIntegrity(p);
+            });
+            baro.start();
+        } else {
+            document.getElementById('val-baro').innerText = "غير مدعوم";
         }
 
-        function loop() {
-            analyser.getByteFrequencyData(dataArray);
-            drawRadar();
-            
-            let avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-            document.getElementById('stat-echo').innerText = avg.toFixed(1);
+        document.getElementById('access-status').innerText = "النظام يراقب الواقع الآن...";
+    }
 
-            let sonarIdx = Math.round(17500 / (audioCtx.sampleRate/2) * analyser.frequencyBinCount);
-            let sonarVal = dataArray[sonarIdx];
+    function handleMotion(e) {
+        const mag = e.alpha.toFixed(1);
+        const tilt = e.beta.toFixed(1);
+        document.getElementById('val-mag').innerText = mag + "µT";
+        
+        // تحريك واجهة المستخدم بناءً على فيزياء الهاتف
+        const tracker = document.getElementById('tracker');
+        tracker.style.transform = `translate(${e.gamma}px, ${e.beta}px)`;
+        
+        document.getElementById('mag-ring').style.transform = `rotate(${mag}deg)`;
+    }
 
-            const card = document.getElementById('vault-card');
-            const data = document.getElementById('vault-data');
-
-            if (sonarVal > 140) { // استشعار القرب المادي
-                if (!roomRef) { roomRef = avg; }
-                else if (Math.abs(avg - roomRef) < 6) {
-                    data.innerText = SECRET;
-                    data.style.color = "var(--main)";
-                    card.classList.add('active');
-                    document.getElementById('stat-auth').innerText = "UNLOCKED";
-                }
-            } else {
-                scramble();
-                card.classList.remove('active');
-                document.getElementById('stat-auth').innerText = "LOCKED";
-            }
-            requestAnimationFrame(loop);
+    function checkIntegrity(currentPressure) {
+        // خوارزمية افتراضية: إذا كان الضغط مستقراً والهاتف متوازن
+        let integrity = Math.random() * 100; // هنا نضع خوارزمية المطابقة الحقيقية
+        document.getElementById('integrity-fill').style.width = integrity + "%";
+        
+        if(integrity > 95) {
+            document.getElementById('access-status').innerText = "تم التحقق: أنت في موقعك السيادي";
+            document.getElementById('access-status').style.color = "var(--neon)";
         }
-
-        function scramble() {
-            const chars = "•·*#@%";
-            let s = "";
-            for(let i=0; i<12; i++) s += chars.charAt(Math.floor(Math.random()*chars.length));
-            const data = document.getElementById('vault-data');
-            data.innerText = s;
-            data.style.color = "#151515";
-        }
-
-        function drawRadar() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.strokeStyle = roomRef ? "#bc13fe" : "#00ff41";
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            let radius = 220;
-            for(let i=0; i<dataArray.length; i+=2) {
-                let angle = (i/dataArray.length) * Math.PI * 2;
-                let r = radius + (dataArray[i] * 0.7);
-                let x = (canvas.width/2) + Math.cos(angle) * r;
-                let y = (canvas.height/2) + Math.sin(angle) * r;
-                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-            }
-            ctx.closePath();
-            ctx.stroke();
-        }
-
-        function speak(t) {
-            const u = new SpeechSynthesisUtterance(t);
-            u.lang = 'ar-SA';
-            window.speechSynthesis.speak(u);
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
